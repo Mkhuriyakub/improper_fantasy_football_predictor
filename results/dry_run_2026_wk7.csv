@@ -1,8 +1,8 @@
-player,position,team,opp,individual_volume,model_mean,espn,p10,p50,p90,actual
-Jahmyr Gibbs,RB,DET,GB,30.6,24.6,26.0,8.9,24.1,39.7,
-Quinshon Judkins,RB,CLE,TEN,11.7,15.2,13.2,4.5,12.3,26.0,
-Chris Olave,WR,NO,PIT,17.3,15.5,15.7,4.1,13.8,26.6,
-Christian Watson,WR,GB,DET,19.2,14.3,16.7,3.6,13.0,25.9,
-Malik Nabers,WR,NYG,HOU,19.6,17.2,17.7,4.7,15.5,25.7,
-Brock Purdy,QB,SF,ATL,22.2,20.6,20.4,7.1,20.1,28.7,
-Brock Bowers,TE,LV,LA,19.9,18.0,18.5,5.2,15.6,26.4,
+player,position,opp,indiv_low,individual_volume,indiv_high,p10,model_mean,p90,espn,actual
+Jahmyr Gibbs,RB,GB,17.7,30.6,41.4,8.9,24.6,39.7,26.0,
+Quinshon Judkins,RB,TEN,7.0,11.7,21.6,4.5,15.2,26.0,13.2,
+Chris Olave,WR,PIT,8.6,17.3,28.2,4.1,15.5,26.6,15.7,
+Christian Watson,WR,DET,7.7,19.2,32.7,3.6,14.3,25.9,16.7,
+Malik Nabers,WR,HOU,1.1,19.6,29.1,4.7,17.2,25.7,17.7,
+Brock Purdy,QB,ATL,16.2,22.2,31.3,7.1,20.6,28.7,20.4,
+Brock Bowers,TE,LA,11.0,19.9,27.6,5.2,18.0,26.4,18.5,
