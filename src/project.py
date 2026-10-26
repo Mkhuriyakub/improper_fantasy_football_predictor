@@ -22,6 +22,18 @@ ROOT = Path(__file__).resolve().parents[1]
 tr_all = pd.read_parquet(ROOT / "results" / f"features_{TRAIN}.parquet")
 te_all = pd.read_parquet(ROOT / "results" / f"features_{SEASON}_wk{WEEK}.parquet")
 
+
+def add_expl(df, season):
+    d = pd.read_parquet(ROOT / "results" / f"expl_def_{season}.parquet").rename(columns={"defteam": "opp"})
+    r = pd.read_parquet(ROOT / "results" / f"expl_rb_{season}.parquet").rename(columns={"rusher_player_id": "player_id"})
+    df = df.merge(d, on=["opp", "week"], how="left").merge(r, on=["player_id", "week"], how="left")
+    df["def_expl_sus"] = df.def_expl_sus.fillna(df.def_expl_sus.median())
+    df["def_expl_tercile"] = df.def_expl_tercile.fillna("mid")
+    return df
+
+
+tr_all, te_all = add_expl(tr_all, TRAIN), add_expl(te_all, SEASON)
+
 COMMON_ENV = ["spread", "implied_total", "total_line", "dome", "off_plays_pg", "off_proe", "off_plays_per_drive", "off_pass_epa",
               "opp_off_plays_pg", "opp_off_plays_per_drive", "opp_def_three_out_rate", "opp_def_plays_allowed_pg", "pace_mismatch"]
 GROUPS = {
@@ -29,7 +41,7 @@ GROUPS = {
         "usage": ["fp_l3", "fp_season", "touches_l3", "carries_l3", "targets_l3", "touch_share_l3", "gl_share", "rz_share",
                   "is_lead_back", "lead_back_out", "script_sens", "script_risk"],
         "environment": COMMON_ENV + ["off_neutral_run_rate", "opp_off_run_rate", "opp_def_blitz_rate", "blitz_x_targets"],
-        "matchup": ["opp_def_explosive_run_allowed", "opp_def_rush_epa_allowed", "opp_def_line_yds_allowed", "line_edge"],
+        "matchup": ["def_expl_sus"],
     },
     "WR": {
         "usage": ["fp_l3", "fp_season", "targets_l3", "rec_l3", "rec_yds_l3", "target_share_l3", "air_share_l3", "adot_l3", "rz_share",
@@ -88,11 +100,16 @@ for pos, grp in GROUPS.items():
     sc = StandardScaler().fit(Xa)
     Xa_s, Xb_s = sc.transform(Xa), sc.transform(Xb)
     med = Ridge(alpha=20).fit(Xa_s, tr.fp)
+    # ceiling model: for RBs the opponent's explosive-run susceptibility improves p90 (validated 2025) without moving the mean
+    cols_q = cols + (["def_expl_sus"] if pos == "RB" and "def_expl_sus" not in cols else [])
+    Xa_q, Xb_q = fill(tr, te, cols_q)
+    sc_q = StandardScaler().fit(Xa_q)
+    Xa_qs, Xb_qs = sc_q.transform(Xa_q), sc_q.transform(Xb_q)
     q10 = QuantileRegressor(quantile=0.10, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
     q50 = QuantileRegressor(quantile=0.50, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
-    q90 = QuantileRegressor(quantile=0.90, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
+    q90 = QuantileRegressor(quantile=0.90, alpha=0.01, solver="highs").fit(Xa_qs, tr.fp)
     te["mean"] = med.predict(Xb_s)
-    te["p10"], te["p50"], te["p90"] = q10.predict(Xb_s), q50.predict(Xb_s), q90.predict(Xb_s)
+    te["p10"], te["p50"], te["p90"] = q10.predict(Xb_s), q50.predict(Xb_s), q90.predict(Xb_qs)
     # group contributions: sum of (standardized feature * coef) by group, relative to an average player
     contrib = pd.DataFrame(Xb_s * med.coef_, columns=cols, index=te.index)
     for gname, gcols in grp.items():
@@ -108,7 +125,8 @@ print("Walk-forward validation on", TRAIN, "(MAE in PPR points / within-week ran
 for pos, n, sc, best in report:
     print(f"  {pos} (n={n}): " + " | ".join(f"{k}: {v['MAE']} / {v['rank']}" for k, v in sc.items()) + f"   -> using '{best}'")
 pd.set_option("display.width", 250)
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "baseline", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
+P["ceiling_flag"] = np.where((P.position == "RB") & (P.def_expl_tercile == "soft"), "soft run D", "")
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
     sel = P[P.player.isin(NAMES)]
 else:
