@@ -12,6 +12,7 @@ Usage:
   python src/features.py 2025            -> results/features_2025.parquet
   python src/features.py 2026 7          -> results/features_2026_wk7.parquet
 """
+import os
 import sys
 from pathlib import Path
 
@@ -41,6 +42,12 @@ sched = load("schedules")
 sched = sched[sched.game_type == "REG"].copy()
 inj = load("injuries")
 rost = load("rosters")
+snaps = load("snaps")
+SNAP_WEIGHT = os.environ.get("SNAP_WEIGHT", "1") == "1"
+_idmap = rost.drop_duplicates("gsis_id")[["gsis_id", "pfr_id"]].dropna()
+_sn = snaps.merge(_idmap, left_on="pfr_player_id", right_on="pfr_id") if snaps is not None else None
+SNAP = {(r.gsis_id, int(r.week)): float(r.offense_pct) for r in _sn.itertuples()} if _sn is not None else {}
+
 
 pbp["play_id"] = pbp.play_id.astype(float)
 ftn["play_id"] = ftn.play_id.astype(float)
@@ -156,12 +163,15 @@ for w in weeks:
         pos = ph.position.iat[-1]
         pe = hs[hs.ev_id == pid]
         l3 = ph.tail(3)
+        wts = np.array([SNAP.get((pid, int(wk)), 1.0) if SNAP_WEIGHT else 1.0 for wk in l3.week]) if len(l3) else np.array([])
+        wts = np.where(np.isnan(wts), 1.0, wts); wts = np.clip(wts, 0.02, 1.0)
+        wm = (lambda col: float(np.average(col.fillna(0).values, weights=wts))) if len(l3) and wts.sum() > 0 else (lambda col: np.nan)
         tm = hist[hist.team == team]
         tt = team_tg[(team_tg.posteam == team) & team_tg.week.isin(l3.week)]
         team_touch = tm[tm.week.isin(l3.week)].groupby("week").touches.sum()
-        share3 = (l3.set_index("week").touches / team_touch).mean() if len(l3) else np.nan
-        tgt_share3 = (l3.targets.sum() / tt.team_targets.sum()) if tt.team_targets.sum() else np.nan
-        air_share3 = (l3.receiving_air_yards.sum() / tt.team_air.sum()) if tt.team_air.sum() else np.nan
+        share3 = float(np.average((l3.set_index("week").touches / team_touch).fillna(0).values, weights=wts)) if len(l3) else np.nan
+        _tt = tt.set_index("week").reindex(l3.week); tgt_share3 = float(np.average((l3.targets.fillna(0).values / _tt.team_targets.replace(0, np.nan).fillna(1).values), weights=wts)) if len(l3) and tt.team_targets.sum() else np.nan
+        air_share3 = float(np.average((l3.receiving_air_yards.fillna(0).values / _tt.team_air.replace(0, np.nan).fillna(1).values), weights=wts)) if len(l3) and tt.team_air.sum() else np.nan
         trail_share = pe.trail_touches.sum() / pe.trail_plays.sum() if pe.trail_plays.sum() >= 30 else np.nan
         neutral_share = pe.neutral_touches.sum() / pe.neutral_plays.sum() if pe.neutral_plays.sum() >= 30 else np.nan
         recent = tm[tm.week >= w - 3]
@@ -176,10 +186,10 @@ for w in weeks:
         rows.append(dict(
             season=SEASON, week=w, player_id=pid, player=ph.player_display_name.iat[-1], position=pos, team=team, opp=opp,
             games_prior=len(ph), weeks_since_last=w - ph.week.iat[-1],
-            fp_l3=l3.fp.mean(), fp_season=ph.fp.mean(), fp_std_l3=l3.fp_std.mean(), rush_fp_l3=l3.rush_fp.mean(), rec_fp_l3=l3.rec_fp.mean(),
-            touches_l3=l3.touches.mean(), carries_l3=l3.carries.fillna(0).mean(), targets_l3=l3.targets.fillna(0).mean(),
-            attempts_l3=l3.attempts.fillna(0).mean(), pass_yds_l3=l3.passing_yards.fillna(0).mean(), pass_td_l3=l3.passing_tds.fillna(0).mean(),
-            rush_yds_l3=l3.rushing_yards.fillna(0).mean(), rec_yds_l3=l3.receiving_yards.fillna(0).mean(), rec_l3=l3.receptions.fillna(0).mean(),
+            fp_l3=wm(l3.fp), fp_season=ph.fp.mean(), fp_std_l3=wm(l3.fp_std), rush_fp_l3=wm(l3.rush_fp), rec_fp_l3=wm(l3.rec_fp),
+            touches_l3=wm(l3.touches), carries_l3=wm(l3.carries), targets_l3=wm(l3.targets),
+            attempts_l3=wm(l3.attempts), pass_yds_l3=wm(l3.passing_yards), pass_td_l3=wm(l3.passing_tds),
+            rush_yds_l3=wm(l3.rushing_yards), rec_yds_l3=wm(l3.receiving_yards), rec_l3=wm(l3.receptions),
             adot_l3=(l3.receiving_air_yards.sum() / max(1, l3.targets.sum())) if l3.targets.sum() else np.nan,
             touch_share_l3=share3, target_share_l3=tgt_share3, air_share_l3=air_share3,
             gl_share=pe.gl.sum() / max(1, pe.touches.sum()), rz_share=pe.rz_touches.sum() / max(1, pe.touches.sum()),
@@ -208,6 +218,6 @@ feat["blitz_x_targets"] = feat.opp_def_blitz_rate * feat.targets_l3
 feat["line_edge"] = feat.off_line_yds - feat.opp_def_line_yds_allowed
 feat["box_x_light_gain"] = feat.opp_def_light_box_rate * feat.off_light_box_ypc_gain
 feat["pass_edge"] = feat.off_pass_epa - (-feat.opp_def_pass_epa_allowed)  # offense strength + defense weakness
-name = f"features_{SEASON}" + (f"_wk{TARGET_WEEK}" if TARGET_WEEK else "")
+name = f"features_{SEASON}" + ("" if SNAP_WEIGHT else "_unw") + (f"_wk{TARGET_WEEK}" if TARGET_WEEK else "")
 feat.to_parquet(OUT / f"{name}.parquet", index=False)
 print(name, feat.shape, feat.position.value_counts().to_dict())
