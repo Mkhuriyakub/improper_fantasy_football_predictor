@@ -34,6 +34,16 @@ def add_expl(df, season):
 
 tr_all, te_all = add_expl(tr_all, TRAIN), add_expl(te_all, SEASON)
 
+
+def add_qb(df, season):
+    q = pd.read_parquet(ROOT / "results" / f"qb_traits_{season}.parquet")
+    df = df.merge(q[["team", "week", "qb_id", "qb_name", "qb_epa", "qb_expl", "qb_changed"]], on=["team", "week"], how="left")
+    df["new_starter"] = df.qb_changed.fillna(0).astype(int)  # starter differs from 3 weeks earlier (what the trailing window reflects)
+    return df
+
+
+tr_all, te_all = add_qb(tr_all, TRAIN), add_qb(te_all, SEASON)
+
 COMMON_ENV = ["spread", "implied_total", "total_line", "dome", "off_plays_pg", "off_proe", "off_plays_per_drive", "off_pass_epa",
               "opp_off_plays_pg", "opp_off_plays_per_drive", "opp_def_three_out_rate", "opp_def_plays_allowed_pg", "pace_mismatch"]
 GROUPS = {
@@ -45,7 +55,7 @@ GROUPS = {
     },
     "WR": {
         "usage": ["fp_l3", "fp_season", "targets_l3", "rec_l3", "rec_yds_l3", "target_share_l3", "air_share_l3", "adot_l3", "rz_share",
-                  "is_lead_receiver", "lead_receiver_out", "carries_l3"],
+                  "is_lead_receiver", "lead_receiver_out", "carries_l3", "new_starter"],
         "environment": COMMON_ENV + ["off_dropbacks_pg", "off_pass_sr"],
         "matchup": ["opp_def_pass_epa_allowed", "opp_def_ypa_allowed", "opp_def_pressure_rate", "opp_def_blitz_rate", "pass_edge"],
     },
