@@ -1,19 +1,19 @@
-team,player,position,p10,p50,p90,mean,ceiling_flag,status
-CAR,Bryce Young,QB,6.9,16.9,28.3,18.6,,none
-CAR,Chuba Hubbard,RB,5.7,14.9,26.9,15.3,,none
-CAR,Tetairoa McMillan,WR,4.1,13.3,24.8,15.2,,none
-CAR,Jalen Coker,WR,3.2,11.1,23.2,12.5,,none
-CAR,Darren Waller,TE,1.3,6.4,14.4,7.6,,none
-CAR,John Metchie III,WR,0.5,4.5,13.9,5.8,,none
-CAR,Tommy Tremble,TE,1.2,6.2,13.8,5.8,,none
-CAR,Trevor Etienne,RB,0.0,1.7,12.2,4.0,,none
-GB,Jordan Love,QB,6.1,18.6,28.3,18.1,,none
-GB,Josh Jacobs,RB,5.1,15.7,29.6,16.0,,none
-GB,Matthew Golden,WR,4.2,13.2,25.4,14.8,,Questionable
-GB,Christian Watson,WR,3.6,12.7,26.2,14.3,,none
-GB,MarShawn Lloyd,RB,2.5,8.2,18.0,11.9,,none
-GB,Tucker Kraft,TE,2.4,8.4,17.5,9.7,,none
-GB,Pierre Strong,RB,1.8,8.1,20.4,9.4,,none
-GB,Savion Williams,WR,1.2,6.5,16.7,7.6,,none
-GB,Kaleb Johnson,RB,-0.2,1.9,10.9,4.5,,none
-GB,Skyy Moore,WR,-0.0,3.3,11.3,4.3,,none
+team,player,position,p10,p50,p90,mean,ceiling_flag,status,espn,espn_matchup,actual
+CAR,Bryce Young,QB,6.9,16.9,28.3,18.6,,none,16.9,Poor,
+CAR,Chuba Hubbard,RB,5.7,14.9,26.9,15.3,,none,15.3,Good,
+CAR,Tetairoa McMillan,WR,4.1,13.3,24.8,15.2,,none,15.6,Great,
+CAR,Jalen Coker,WR,3.2,11.1,23.2,12.5,,none,14.5,Great,
+CAR,Darren Waller,TE,1.3,6.4,14.4,7.6,,none,,,
+CAR,John Metchie III,WR,0.5,4.5,13.9,5.8,,none,,,
+CAR,Tommy Tremble,TE,1.2,6.2,13.8,5.8,,none,,,
+CAR,Trevor Etienne,RB,0.0,1.7,12.2,4.0,,none,,,
+GB,Jordan Love,QB,6.1,18.6,28.3,18.1,,none,17.0,Shaky,
+GB,Josh Jacobs,RB,5.1,15.7,29.6,16.0,,none,15.1,Great,
+GB,Matthew Golden,WR,4.2,13.2,25.4,14.8,,Questionable,15.1,Shaky,
+GB,Christian Watson,WR,3.6,12.7,26.2,14.3,,none,14.5,Shaky,
+GB,MarShawn Lloyd,RB,2.5,8.2,18.0,11.9,,none,,,
+GB,Tucker Kraft,TE,2.4,8.4,17.5,9.7,,none,10.8,Average,
+GB,Pierre Strong,RB,1.8,8.1,20.4,9.4,,none,,,
+GB,Savion Williams,WR,1.2,6.5,16.7,7.6,,none,,,
+GB,Kaleb Johnson,RB,-0.2,1.9,10.9,4.5,,none,,,
+GB,Skyy Moore,WR,-0.0,3.3,11.3,4.3,,none,,,
