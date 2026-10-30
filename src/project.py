@@ -44,6 +44,36 @@ def add_qb(df, season):
 
 tr_all, te_all = add_qb(tr_all, TRAIN), add_qb(te_all, SEASON)
 
+
+def add_qb_components(df, season):
+    """Trailing passing-only and rushing-only fantasy points for quarterbacks (walk-forward)."""
+    st = pd.read_parquet(ROOT / "data" / f"player_stats_{season}.parquet")
+    st = st[st.season_type == "REG"].sort_values(["player_id", "week"]).copy()
+    st["pass_fp_g"] = st.passing_yards.fillna(0) * 0.04 + st.passing_tds.fillna(0) * 4 - st.passing_interceptions.fillna(0) * 2 - st.sack_fumbles_lost.fillna(0) * 2
+    st["rush_fp_g"] = st.rushing_yards.fillna(0) * 0.1 + st.rushing_tds.fillna(0) * 6 - st.rushing_fumbles_lost.fillna(0) * 2
+    g = st.groupby("player_id")
+    st["pass_fp_l3"] = g.pass_fp_g.transform(lambda s: s.shift().rolling(3, min_periods=1).mean())
+    st["pass_fp_season"] = g.pass_fp_g.transform(lambda s: s.shift().expanding().mean())
+    st["rush_fp_season"] = g.rush_fp_g.transform(lambda s: s.shift().expanding().mean())
+    # for a target week beyond the data, carry the latest values forward
+    latest = st.groupby("player_id")[["pass_fp_g", "rush_fp_g"]].apply(lambda x: pd.Series({
+        "pass_fp_l3_latest": x.pass_fp_g.tail(3).mean(), "pass_fp_season_latest": x.pass_fp_g.mean(), "rush_fp_season_latest": x.rush_fp_g.mean()}))
+    df = df.merge(st[["player_id", "week", "pass_fp_l3", "pass_fp_season", "rush_fp_season"]], on=["player_id", "week"], how="left")
+    df = df.merge(latest, left_on="player_id", right_index=True, how="left")
+    for c in ["pass_fp_l3", "pass_fp_season", "rush_fp_season"]:
+        df[c] = df[c].fillna(df[c + "_latest"])
+    df["pass_fp"] = df.fp - df.rush_fp - df.rec_fp
+    return df
+
+
+tr_all, te_all = add_qb_components(tr_all, TRAIN), add_qb_components(te_all, SEASON)
+_QB_PASS_BASE = ["pass_fp_l3", "pass_fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "qb_epa"]
+_QB_PASS_TAIL = [
+    "off_dropbacks_pg", "off_pass_sr", "off_rz_plays_pg", "opp_def_pass_epa_allowed", "opp_def_ypa_allowed", "opp_def_pressure_rate",
+    "opp_def_sack_rate", "opp_def_blitz_rate", "pass_edge"]
+QB_RUSH = ["rush_yds_l3", "carries_l3", "rush_fp_l3", "rush_fp_season", "spread", "implied_total", "off_rz_plays_pg",
+           "opp_def_rush_epa_allowed", "opp_def_line_yds_allowed"]
+
 COMMON_ENV = ["spread", "implied_total", "total_line", "dome", "off_plays_pg", "off_proe", "off_plays_per_drive", "off_pass_epa",
               "opp_off_plays_pg", "opp_off_plays_per_drive", "opp_def_three_out_rate", "opp_def_plays_allowed_pg", "pace_mismatch"]
 GROUPS = {
@@ -110,6 +140,14 @@ for pos, grp in GROUPS.items():
     sc = StandardScaler().fit(Xa)
     Xa_s, Xb_s = sc.transform(Xa), sc.transform(Xb)
     med = Ridge(alpha=20).fit(Xa_s, tr.fp)
+    if pos == "QB":
+        # split model: passing and rushing projected separately and summed (validated 2025: better rank, lower tier bias)
+        QB_PASS = _QB_PASS_BASE + COMMON_ENV + _QB_PASS_TAIL
+        Xp_a, Xp_b = fill(tr, te, QB_PASS); Xr_a, Xr_b = fill(tr, te, QB_RUSH)
+        scp, scr = StandardScaler().fit(Xp_a), StandardScaler().fit(Xr_a)
+        mp = Ridge(alpha=60).fit(scp.transform(Xp_a), tr.pass_fp)
+        mr = Ridge(alpha=20).fit(scr.transform(Xr_a), tr.rush_fp)
+        te["mean_pass"], te["mean_rush"] = mp.predict(scp.transform(Xp_b)), mr.predict(scr.transform(Xr_b))
     # ceiling model: for RBs the opponent's explosive-run susceptibility improves p90 (validated 2025) without moving the mean
     cols_q = cols + (["def_expl_sus"] if pos == "RB" and "def_expl_sus" not in cols else [])
     Xa_q, Xb_q = fill(tr, te, cols_q)
@@ -118,7 +156,7 @@ for pos, grp in GROUPS.items():
     q10 = QuantileRegressor(quantile=0.10, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
     q50 = QuantileRegressor(quantile=0.50, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
     q90 = QuantileRegressor(quantile=0.90, alpha=0.01, solver="highs").fit(Xa_qs, tr.fp)
-    te["mean"] = med.predict(Xb_s)
+    te["mean"] = (te.mean_pass + te.mean_rush) if pos == "QB" else med.predict(Xb_s)
     te["p10"], te["p50"], te["p90"] = q10.predict(Xb_s), q50.predict(Xb_s), q90.predict(Xb_qs)
     # group contributions: sum of (standardized feature * coef) by group, relative to an average player
     contrib = pd.DataFrame(Xb_s * med.coef_, columns=cols, index=te.index)
