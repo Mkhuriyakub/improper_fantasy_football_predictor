@@ -67,10 +67,22 @@ def add_qb_components(df, season):
 
 
 tr_all, te_all = add_qb_components(tr_all, TRAIN), add_qb_components(te_all, SEASON)
+
+
+def add_def_tiers(df, season):
+    """Opponent pass-defense rating on the absolute, era-adjusted scale (src/def_tiers.py)."""
+    t = pd.read_parquet(ROOT / "results" / f"def_tiers_{season}.parquet").rename(columns={"defteam": "opp"})
+    df = df.merge(t[["opp", "week", "def_rel_epa", "def_tier"]], on=["opp", "week"], how="left")
+    df["def_rel_epa"] = df.def_rel_epa.fillna(0)
+    df["def_tier"] = df.def_tier.fillna("avg or below")
+    return df
+
+
+tr_all, te_all = add_def_tiers(tr_all, TRAIN), add_def_tiers(te_all, SEASON)
 _QB_PASS_BASE = ["pass_fp_l3", "pass_fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "qb_epa"]
 _QB_PASS_TAIL = [
-    "off_dropbacks_pg", "off_pass_sr", "off_rz_plays_pg", "opp_def_pass_epa_allowed", "opp_def_ypa_allowed", "opp_def_pressure_rate",
-    "opp_def_sack_rate", "opp_def_blitz_rate", "pass_edge"]
+    "off_dropbacks_pg", "off_pass_sr", "off_rz_plays_pg", "def_rel_epa", "opp_def_ypa_allowed", "opp_def_pressure_rate",
+    "opp_def_sack_rate", "opp_def_blitz_rate"]  # def_rel_epa: absolute-scale pass D rating (validated 2025: better rank, less bias vs strong D)
 QB_RUSH = ["rush_yds_l3", "carries_l3", "rush_fp_l3", "rush_fp_season", "spread", "implied_total", "off_rz_plays_pg",
            "opp_def_rush_epa_allowed", "opp_def_line_yds_allowed"]
 
@@ -192,7 +204,7 @@ for pos, n, sc, best in report:
     print(f"  {pos} (n={n}): " + " | ".join(f"{k}: {v['MAE']} / {v['rank']}" for k, v in sc.items()) + f"   -> using '{best}'")
 pd.set_option("display.width", 250)
 P["ceiling_flag"] = np.where((P.position == "RB") & (P.def_expl_tercile == "soft"), "soft run D", "")
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
     sel = P[P.player.isin(NAMES)]
 else:
