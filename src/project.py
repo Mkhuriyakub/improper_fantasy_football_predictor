@@ -168,13 +168,31 @@ for pos, grp in GROUPS.items():
     projections.append(te)
 
 P = pd.concat(projections)
+
+
+def shootout_flag(P):
+    """Game-level label: both offenses top-third (pass EPA), spread <= 3.5, neither defense top-7 against the pass.
+    2023-25: ~40% of such games reached 63+ combined points vs an 11% base rate (small n)."""
+    t = P.drop_duplicates(["team", "week"])[["team", "opp", "week", "off_pass_epa", "opp_def_pass_epa_allowed", "spread"]].copy()
+    t["off_rank"] = t.groupby("week").off_pass_epa.rank(ascending=False)
+    t["def_rank"] = t.groupby("week").opp_def_pass_epa_allowed.rank(ascending=True)  # opp's defense; 1 = best
+    n = t.groupby("week").team.transform("size")
+    t["off_top3rd"] = t.off_rank <= n / 3
+    t["opp_def_elite"] = t.def_rank <= 7
+    o = t[["team", "week", "off_top3rd", "opp_def_elite"]].rename(columns={"team": "opp", "off_top3rd": "opp_off_top3rd", "opp_def_elite": "own_def_elite"})
+    t = t.merge(o, on=["opp", "week"], how="left")
+    t["shootout"] = (t.off_top3rd & t.opp_off_top3rd.fillna(False) & (t.spread.abs() <= 3.5) & ~t.opp_def_elite & ~t.own_def_elite.fillna(False)).astype(int)
+    return P.merge(t[["team", "week", "shootout"]], on=["team", "week"], how="left")
+
+
+P = shootout_flag(P)
 P.to_parquet(ROOT / "results" / f"projections_{SEASON}_wk{WEEK}.parquet", index=False)
 print("Walk-forward validation on", TRAIN, "(MAE in PPR points / within-week rank correlation):")
 for pos, n, sc, best in report:
     print(f"  {pos} (n={n}): " + " | ".join(f"{k}: {v['MAE']} / {v['rank']}" for k, v in sc.items()) + f"   -> using '{best}'")
 pd.set_option("display.width", 250)
 P["ceiling_flag"] = np.where((P.position == "RB") & (P.def_expl_tercile == "soft"), "soft run D", "")
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
     sel = P[P.player.isin(NAMES)]
 else:
