@@ -29,9 +29,17 @@ pip install nflreadpy pandas pyarrow
 python src/load_data.py 2025
 ```
 
+## Where things stand
+
+- **[FINDINGS.md](FINDINGS.md)** — what the data has shown: validated signals, rejected ideas, live results vs ESPN, known gaps.
+- **[MODEL.md](MODEL.md)** — how the current model works, how to run it, conventions, validation numbers, next changes.
+- `results/dry_run_*.csv` and `results/board_*.csv` — weekly projection logs with ESPN comparisons and actuals.
+
+Both documents are updated as the season goes on.
+
 ## Layout
 
-- `src/` – data loading, feature building, models, scoring
+- `src/` – data loading, trait builders, feature building, models (see MODEL.md for the pipeline)
 - `data/` – downloaded parquet files (not committed; regenerate with `load_data.py`)
 - `results/` – metric tables and backtest output
 - `notebooks/` – exploratory analysis
