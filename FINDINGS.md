@@ -136,6 +136,37 @@ by offense snap share improved rank accuracy at every position on 2025.
 **The projections are calibrated.** Across 171 players in week 7 2026, 80%
 landed inside the 80% range (85/80/73/81% by position).
 
+**Pedigree and prior-season efficiency separate "thrust into volume" from
+"earned the role."** (2018–25 RB weekly data; validated as model inputs on
+2024 and 2025 walk-forward.)
+
+- Per touch, backs thrust into 12+ touches after averaging < 8 are as
+  efficient as established starters (0.848 vs 0.852 PPR/touch, 4.88 vs 4.89
+  yds/touch; 434 spike weeks). The pts/g gap is volume (16 vs 19 touches),
+  not talent, *on average*.
+- The average hides the split the question is about. In spike weeks: top-64
+  picks 0.90–1.02 PPR/touch vs 0.80–0.86 for day-3 picks and UDFAs; backs
+  with a high prior-career efficiency (shrunk, ≥ 0.87/touch) 0.94 vs 0.81 for
+  the low third. Veterans (5+ years) with a low career rate: 0.73 — the
+  journeyman case — vs 0.95 for veterans with a high one. Rookies have no
+  career data, so draft capital carries it for them.
+- After three straight 12+ touch weeks (64 events), everyone falls back
+  (14.8 → 10.9 pts/g, 17.8 → 13.8 touches) as starters return or committees
+  form. Top-64 picks hold their volume (16.1 touches, 14.1 pts/g); day-3 and
+  undrafted backs don't (12.6–14.5 touches, 9.7–10.9 pts/g). Efficiency during
+  the three weeks also predicts the next four: > 0.95 PPR/touch → 13.9 pts/g
+  and 15.8 touches; < 0.75 → 9.5 and 12.9. Efficiency earns touches.
+  Regression on the 64 events: +3.2 pts/g for a top-64 pick (p=0.05), +1.0
+  pts/g per 0.1 PPR/touch during the run (p=0.003).
+- As model inputs (draft pick, experience, prior-season PPR/opportunity shrunk
+  with a 150-opportunity prior, prior opportunities/g), scored on top+emerging
+  players: RB 6.38→6.29 (2024), 6.72→6.66 (2025); WR 6.57→6.54, 6.62→6.22; TE
+  5.89→5.89, 5.84→5.70. Emerging RBs: over-projection bias −1.6→−0.9 (2024),
+  −0.5→−0.15 (2025). No gain for QBs; not used there. With these inputs every
+  position's model beats the season average on the top+emerging population.
+- `src/comps.py` returns the ten closest historical comps (pedigree,
+  experience, 3-week touches and efficiency) and their next-four-game line.
+
 ## Tested and rejected: these don't improve weekly projections
 
 - Team-level line metrics (adjusted line yards, stuff rate, sack rate,

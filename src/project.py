@@ -79,6 +79,17 @@ def add_def_tiers(df, season):
 
 
 tr_all, te_all = add_def_tiers(tr_all, TRAIN), add_def_tiers(te_all, SEASON)
+
+
+def add_pedigree(df, season):
+    """Draft capital, experience and prior-season efficiency (src/pedigree.py). Validated 2024+2025 for RB/WR/TE:
+    lowers MAE on top+emerging players and removes most of the over-projection of backs thrust into volume."""
+    p = pd.read_parquet(ROOT / "results" / f"pedigree_{season}.parquet")
+    return df.merge(p, on="player_id", how="left")
+
+
+tr_all, te_all = add_pedigree(tr_all, TRAIN), add_pedigree(te_all, SEASON)
+PEDIGREE = ["top64", "log_pick", "exp", "prior_fp_per_opp", "prior_opp_pg"]
 _QB_PASS_BASE = ["pass_fp_l3", "pass_fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "qb_epa"]
 _QB_PASS_TAIL = [
     "off_dropbacks_pg", "off_pass_sr", "off_rz_plays_pg", "def_rel_epa", "opp_def_ypa_allowed", "opp_def_pressure_rate",
@@ -91,13 +102,13 @@ COMMON_ENV = ["spread", "implied_total", "total_line", "dome", "off_plays_pg", "
 GROUPS = {
     "RB": {
         "usage": ["fp_l3", "fp_season", "touches_l3", "carries_l3", "targets_l3", "touch_share_l3", "gl_share", "rz_share",
-                  "is_lead_back", "lead_back_out", "script_sens", "script_risk"],
+                  "is_lead_back", "lead_back_out", "script_sens", "script_risk"] + PEDIGREE,
         "environment": COMMON_ENV + ["off_neutral_run_rate", "opp_off_run_rate", "opp_def_blitz_rate", "blitz_x_targets"],
         "matchup": ["def_expl_sus"],
     },
     "WR": {
         "usage": ["fp_l3", "fp_season", "targets_l3", "rec_l3", "rec_yds_l3", "target_share_l3", "air_share_l3", "adot_l3", "rz_share",
-                  "is_lead_receiver", "lead_receiver_out", "carries_l3", "new_starter"],
+                  "is_lead_receiver", "lead_receiver_out", "carries_l3", "new_starter"] + PEDIGREE,
         "environment": COMMON_ENV + ["off_dropbacks_pg", "off_pass_sr"],
         "matchup": ["opp_def_pass_epa_allowed", "opp_def_ypa_allowed", "opp_def_pressure_rate", "opp_def_blitz_rate", "pass_edge"],
     },
@@ -185,8 +196,8 @@ for pos, grp in GROUPS.items():
     te["p10"], te["p50"], te["p90"] = q10.predict(Xb_s), q50.predict(Xb_s), q90.predict(Xb_qs)
     # group contributions: sum of (standardized feature * coef) by group, relative to an average player
     contrib = pd.DataFrame(Xb_s * med.coef_, columns=cols, index=te.index)
-    for gname, gcols in grp.items():
-        gc = [c for c in gcols if c in cols]
+    for gname, gcols in {**grp, "pedigree": PEDIGREE}.items():
+        gc = [c for c in gcols if c in cols and (gname == "pedigree" or c not in PEDIGREE)]
         te["contrib_" + gname] = contrib[gc].sum(axis=1) if gc else 0.0
     te["baseline"] = med.intercept_
     te["model_used"] = best

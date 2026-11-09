@@ -9,6 +9,7 @@ python src/load_data.py 2026            # refresh raw data (pbp, FTN, stats, sch
 python src/expl_traits.py 2026          # explosive-run traits (defense + rusher), prior-season prior
 python src/qb_traits.py 2026            # each team's expected starter and his profile, walk-forward
 python src/def_tiers.py 2026            # pass-defense rating on the absolute 2000-25 scale
+python src/pedigree.py 2026             # draft capital, experience, prior-season efficiency (needs player_stats 2018+)
 python src/features.py 2026 <week>      # walk-forward feature table for the target week
 python src/project.py 2025 2026 <week> [player names...]   # fit on 2025, project the week
 ```
@@ -37,8 +38,8 @@ Per player, using only games before the target week:
 
 | Position | Mean model | Features used | Range (p10/p90) |
 |---|---|---|---|
-| RB | usage only | trailing usage, shares, role flags, script sensitivity | quantile regression on total pts; p90 adds opponent explosive-run susceptibility |
-| WR / TE | usage only | trailing usage, target/air-yard shares, aDOT, role flags, new-starter flag | quantile regression |
+| RB | usage + pedigree (+ environment) | trailing usage, shares, role flags, script sensitivity; draft pick, experience, prior-season efficiency and volume | quantile regression on total pts; p90 adds opponent explosive-run susceptibility |
+| WR / TE | usage + pedigree (+ environment) | trailing usage, target/air-yard shares, aDOT, role flags, new-starter flag; pedigree as above | quantile regression |
 | QB | passing + rushing, summed | passing: trailing passing pts, attempts, QB efficiency, environment, absolute-scale pass-defense rating, pressure/sack/blitz; rushing: trailing rush yards/carries, spread, implied total | quantile regression on total pts |
 
 **Validation is scored on the players that matter**: the top-N by season
@@ -93,7 +94,9 @@ plain season average, so the validation ladder and the architecture change.
 
 1. ~~Season-average baseline in the ladder~~ — done; validation now scored on
    top + emerging players (see FINDINGS, "Measured on the players that matter").
-2. Returning-teammate flag (Hall/Allen); test on 2025 top+emerging.
+2. Returning-teammate flag (Hall/Allen); test on 2024+2025 top+emerging.
+3. Extend the comps tool (`src/comps.py`) to WR/TE and to the "returning
+   starter" case; surface comps on the weekly board for emerging players.
 3. Keep the quantile models for ranges; move QB quantiles onto split inputs.
 4. Re-pull Vegas lines on game day (schedules file goes stale).
 5. Deferred: snap-share trend, QB–receiver reconciliation, def_tiers fade,
