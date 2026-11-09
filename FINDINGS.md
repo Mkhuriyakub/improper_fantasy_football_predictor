@@ -164,6 +164,16 @@ landed inside the 80% range (85/80/73/81% by position).
   5.89→5.89, 5.84→5.70. Emerging RBs: over-projection bias −1.6→−0.9 (2024),
   −0.5→−0.15 (2025). No gain for QBs; not used there. With these inputs every
   position's model beats the season average on the top+emerging population.
+- Snap share (last game, 3-game, trend) and share of team RB carries as
+  model inputs: no gain for RB or WR on 2024/2025 (the snap-weighted trailing
+  stats and touch/target shares already carry it; players whose snap share
+  just jumped 12+ points are projected without bias by the existing model).
+  Small gain for TEs (5.89→5.75, 5.70→5.65), adopted there. In the emergence
+  study, snap share during the three-week run — level or slope — predicts
+  nothing about the next four games (everyone's snap share settles to
+  52–58%); efficiency per touch and draft capital are what predict retention.
+  Route participation and targets per route are not available in-season from
+  free sources.
 - `src/comps.py` returns the ten closest historical comps (pedigree,
   experience, 3-week touches and efficiency) and their next-four-game line.
 

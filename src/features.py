@@ -170,6 +170,12 @@ for w in weeks:
         tt = team_tg[(team_tg.posteam == team) & team_tg.week.isin(l3.week)]
         team_touch = tm[tm.week.isin(l3.week)].groupby("week").touches.sum()
         share3 = float(np.average((l3.set_index("week").touches / team_touch).fillna(0).values, weights=wts)) if len(l3) else np.nan
+        team_carries = tm[tm.week.isin(l3.week) & (tm.position != "QB")].groupby("week").carries.sum()
+        carry_share3 = float(np.average((l3.set_index("week").carries / team_carries.replace(0, np.nan)).fillna(0).values, weights=wts)) if len(l3) else np.nan
+        snaps3 = [SNAP.get((pid, int(wk)), np.nan) for wk in l3.week]
+        snap_last = snaps3[-1] if len(snaps3) else np.nan
+        snap_l3 = float(np.nanmean(snaps3)) if len(snaps3) and not all(np.isnan(snaps3)) else np.nan
+        snap_trend = (snaps3[-1] - np.nanmean(snaps3[:-1])) if len(snaps3) >= 2 and not np.isnan(snaps3[-1]) and not all(np.isnan(snaps3[:-1])) else 0.0
         _tt = tt.set_index("week").reindex(l3.week); tgt_share3 = float(np.average((l3.targets.fillna(0).values / _tt.team_targets.replace(0, np.nan).fillna(1).values), weights=wts)) if len(l3) and tt.team_targets.sum() else np.nan
         air_share3 = float(np.average((l3.receiving_air_yards.fillna(0).values / _tt.team_air.replace(0, np.nan).fillna(1).values), weights=wts)) if len(l3) and tt.team_air.sum() else np.nan
         trail_share = pe.trail_touches.sum() / pe.trail_plays.sum() if pe.trail_plays.sum() >= 30 else np.nan
@@ -191,7 +197,8 @@ for w in weeks:
             attempts_l3=wm(l3.attempts), pass_yds_l3=wm(l3.passing_yards), pass_td_l3=wm(l3.passing_tds),
             rush_yds_l3=wm(l3.rushing_yards), rec_yds_l3=wm(l3.receiving_yards), rec_l3=wm(l3.receptions),
             adot_l3=(l3.receiving_air_yards.sum() / max(1, l3.targets.sum())) if l3.targets.sum() else np.nan,
-            touch_share_l3=share3, target_share_l3=tgt_share3, air_share_l3=air_share3,
+            touch_share_l3=share3, target_share_l3=tgt_share3, air_share_l3=air_share3, carry_share_l3=carry_share3,
+            snap_last=snap_last, snap_l3=snap_l3, snap_trend=snap_trend,
             gl_share=pe.gl.sum() / max(1, pe.touches.sum()), rz_share=pe.rz_touches.sum() / max(1, pe.touches.sum()),
             trail_share=trail_share, neutral_share=neutral_share,
             script_sens=(trail_share - neutral_share) if pd.notna(trail_share) and pd.notna(neutral_share) else 0.0,

@@ -118,7 +118,8 @@ GROUPS = {
         "matchup": ["opp_def_pass_epa_allowed", "opp_def_ypa_allowed", "opp_def_pressure_rate", "opp_def_sack_rate", "opp_def_blitz_rate", "pass_edge"],
     },
 }
-GROUPS["TE"] = {**GROUPS["WR"], "matchup": GROUPS["WR"]["matchup"] + ["opp_def_te_target_share"]}
+GROUPS["TE"] = {**GROUPS["WR"], "usage": GROUPS["WR"]["usage"] + ["snap_last"],  # snap share helps TEs only (2024+25)
+                "matchup": GROUPS["WR"]["matchup"] + ["opp_def_te_target_share"]}
 MIN_USAGE = {"RB": ("touches_l3", 6), "WR": ("targets_l3", 3), "TE": ("targets_l3", 3), "QB": ("attempts_l3", 15)}
 TOPN = {"RB": 24, "WR": 36, "TE": 12, "QB": 16}  # validation is scored on these plus emerging players
 
