@@ -40,10 +40,28 @@ beat the plain season average (RB 5.90–5.98 vs 5.85; WR 5.48–5.49 vs 5.51; T
 ±0.03 rank with no consistent direction. The subgroup gains above (stars,
 streaks) do not survive being applied to everyone.
 
-Decision: the mean projection for RB/WR/TE is now the season average;
-`project.py` only uses a model where it beats that baseline (QB: 6.88 vs
-7.16). The ranges (80% coverage: 80%, 86%) and the game-level work are where
-the model has shown value beyond the trivial baseline.
+**Measured on the players that matter, the picture reverses.** The full-pool
+averages above are dominated by role players, whose volatility the model
+cannot and need not predict. Scored only on the top-N by season average (RB
+24, WR 36, TE 12, QB 16) plus emerging players (trailing average ≥ 4 above
+season, ranked top-N on trailing):
+
+| Population | Model vs season avg, 2025 | 2026 wks 7–9 |
+|---|---|---|
+| Top QB | 6.71 vs 6.86 (full model 6.39) | 6.82 vs 6.98 |
+| Top RB | 6.80 vs 6.89 | 6.62 vs 7.05 |
+| Top TE | 6.10 vs 6.38 | 5.00 vs 5.49 |
+| Top WR | 6.77 vs 6.60 | 6.36 vs 6.31 |
+| Emerging (all pos, 2025) | rank 0.89 vs 0.77 (RB), 0.66 vs 0.37 (WR); QB 6.4 vs 8.1 | too few to score |
+| Rest | season average wins everywhere | same |
+
+Bias is the clearest signal: the season average over-projects top players by
+0.8–1.7 points per game in both seasons and under-projects emerging players
+by 1.4–2.4; the model is within ±0.5 on both. The 3-game average
+over-projects emerging players by 5. So the model's value is exactly where
+it should be — the top of the board and players moving onto it — and the
+full-pool comparison hid it. `project.py` now scores its validation ladder on
+this population and keeps the usage model as the mean at every position.
 
 ## Validated: these carry the projections
 

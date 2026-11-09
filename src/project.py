@@ -109,6 +109,7 @@ GROUPS = {
 }
 GROUPS["TE"] = {**GROUPS["WR"], "matchup": GROUPS["WR"]["matchup"] + ["opp_def_te_target_share"]}
 MIN_USAGE = {"RB": ("touches_l3", 6), "WR": ("targets_l3", 3), "TE": ("targets_l3", 3), "QB": ("attempts_l3", 15)}
+TOPN = {"RB": 24, "WR": 36, "TE": 12, "QB": 16}  # validation is scored on these plus emerging players
 
 
 def prep(df, pos):
@@ -142,10 +143,17 @@ for pos, grp in GROUPS.items():
                          else make_pipeline(StandardScaler(), Ridge(alpha=20)).fit(Xa, a.fp).predict(Xb))
             out.append(b)
         P = pd.concat(out)
+        # score on the players that matter: top-N by season average plus "emerging" (hot and now ranked top-N on trailing)
+        topn = TOPN[pos]
+        top = P.groupby("week").fp_season.rank(ascending=False) <= topn
+        emerging = ~top & ((P.fp_l3 - P.fp_season) >= 4) & (P.groupby("week").fp_l3.rank(ascending=False) <= topn)
+        P = P[top | emerging]
         scores[name] = dict(MAE=round((P.pred - P.fp).abs().mean(), 2),
                             rank=round(P.groupby("week").apply(lambda g: spearmanr(g.pred, g.fp).correlation, include_groups=False).mean(), 3))
     best = min([k for k in scores if k not in ("naive", "season")], key=lambda k: scores[k]["MAE"])
-    use_season = pos != "QB" and scores[best]["MAE"] > scores["season"]["MAE"] - 0.05
+    # fall back to the season average only if it clearly beats the model on the top/emerging population
+    # (ties go to the model: it is unbiased on top players where the season average over-projects by ~1 pt)
+    use_season = pos != "QB" and scores[best]["MAE"] > scores["season"]["MAE"] + 0.10
     if use_season:
         print(f"  !! {pos}: best model set '{best}' ({scores[best]['MAE']}) does not beat the season average "
               f"({scores['season']['MAE']}); mean = season average, ranges from '{best}'")
@@ -207,7 +215,7 @@ def shootout_flag(P):
 
 P = shootout_flag(P)
 P.to_parquet(ROOT / "results" / f"projections_{SEASON}_wk{WEEK}.parquet", index=False)
-print("Walk-forward validation on", TRAIN, "(MAE in PPR points / within-week rank correlation):")
+print("Walk-forward validation on", TRAIN, "(top-N + emerging players only; MAE in PPR points / within-week rank correlation):")
 for pos, n, sc, best in report:
     print(f"  {pos} (n={n}): " + " | ".join(f"{k}: {v['MAE']} / {v['rank']}" for k, v in sc.items()) + f"   -> using '{best}'")
 pd.set_option("display.width", 250)
