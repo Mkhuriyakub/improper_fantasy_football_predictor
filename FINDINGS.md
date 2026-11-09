@@ -5,6 +5,41 @@ tested on free nflverse data, mostly the 2025 season walk-forward (each week
 projected from prior weeks only) with 2023–24 and 2000–25 used where noted.
 Updated through week 9 of the 2026 season.
 
+## The headline, after week 9: the model has not beaten a season average
+
+Every "validated" gain below was measured against a 3-game trailing average.
+That was the wrong baseline. Against each player's plain season-to-date
+average on the same sample:
+
+| | Model MAE | Season-avg MAE | Model rank | Season-avg rank |
+|---|---|---|---|---|
+| 2025 walk-forward (2,204 player-weeks) | 5.85 | **5.79** | 0.38 | 0.38 |
+| 2026 live, weeks 7–9 (503) | 5.65 | 5.64 | 0.41 | **0.42** |
+
+The ridge over twelve usage features is a season average with ~0.1 points of
+noise either way. The 3-game average is clearly worse than both (6.6 / 6.1).
+
+Where the model does beat the season average (2025): stars with 15+ pts/g
+(7.16 vs 7.47; the season average over-projects them by 2.0, the model is
+unbiased, so the regression is right), hot and cold streaks (±5 vs season:
+5.8 vs 6.0 and 6.1 vs 6.5), small samples of ≤5 games (5.41 vs 5.47), and
+teammate-out weeks (6.76 vs 7.05, though the model over-shoots the boost by
+2.2 pts). Where it is worse: low-volume players (over-projected by 0.6),
+players with 10+ games (the average is already right), and big underdogs
+(over-projected by 1.4; adding the spread removes the bias but not the MAE).
+
+The "we regress stars too hard" worry from the ESPN comparisons does not hold
+in aggregate: 2026 top-quartile RBs averaged 16.0 actual vs 17.9 projected and
+19.9 season average; WRs 18.1 vs 16.9 vs 19.5; QBs 18.1 vs 17.5 vs 19.3. ESPN
+won on individual players, not on a systematic lean.
+
+What this implies: the right architecture is a season average as the spine
+with a handful of situational adjustments (star regression, streak regression,
+teammate-out at a smaller size than the model learned, spread for underdogs,
+returning-teammate), not a ridge regression over usage features. The ranges
+(80% coverage: 80%, 86%) and the game-level work are where the model has
+shown value beyond the trivial baseline.
+
 ## Validated: these carry the projections
 
 **Volume and role are the predictable core.** A player's recent touch/target

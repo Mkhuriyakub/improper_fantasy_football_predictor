@@ -56,8 +56,10 @@ coverage. `mean` — expected value, the number comparable to ESPN. `ceiling_fla
 ## Conventions
 
 - **Projection = median.** Use the mean for sums and for ESPN comparison.
-- **Regression toward the position average is deliberate** and currently
-  heavier than ESPN's. Under review (see FINDINGS.md, live results).
+- **Regression toward the position average is deliberate.** On 2025 and on
+  2026 weeks 7–9 the model is unbiased on stars while the season average
+  over-projects them by ~2 points; ESPN's wins on individual stars were not a
+  systematic lean.
 - **Rerun Saturday** against the final injury report before grading.
 - **Grade every Monday**: fill the `actual` column in that week's log in
   `results/`, compare MAE and rank vs ESPN and vs the naive baseline, and check
@@ -77,11 +79,15 @@ is close to noise for every model we've tested.
 
 ## Next changes, in order
 
-1. Snap-share trend and depth-chart rank as usage inputs (role changes a week
-   earlier).
-2. Move the QB quantile models onto the split passing/rushing inputs.
-3. Reconcile each team's pass-catcher projections to its QB's passing
-   projection; validate on 2025 before adopting.
-4. Fade the prior-season weight in `def_tiers.py` as the current season's
-   sample grows.
-5. Test letting the explosive trait lift the *mean* for top-decile backs.
+Reset after week 9 (see FINDINGS.md headline): the model has not beaten a
+plain season average, so the validation ladder and the architecture change.
+
+1. Add `fp_season` as a baseline in the `project.py` ladder; every feature set
+   must beat it, not the 3-game average.
+2. Rebuild the mean as season average + situational adjustments (star
+   regression, streak regression, teammate-out sized from 2025, spread for
+   underdogs, returning-teammate flag). Compare to the ridge on 2025 and live.
+3. Keep the quantile models for ranges; move QB quantiles onto split inputs.
+4. Re-pull Vegas lines on game day (schedules file goes stale).
+5. Deferred: snap-share trend, QB–receiver reconciliation, def_tiers fade,
+   explosive trait on the mean.
