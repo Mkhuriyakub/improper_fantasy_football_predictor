@@ -128,7 +128,7 @@ for pos, grp in GROUPS.items():
     tr = prep(tr_all, pos)
     tr = tr[tr.played == 1]
     all_cols = grp["usage"] + grp["environment"] + grp["matchup"]
-    ladder = {"naive": ["fp_l3"], "usage": grp["usage"], "usage+env": grp["usage"] + grp["environment"], "full": all_cols}
+    ladder = {"naive": ["fp_l3"], "season": ["fp_season"], "usage": grp["usage"], "usage+env": grp["usage"] + grp["environment"], "full": all_cols}
     # ---- walk-forward validation on the training season
     scores = {}
     for name, cols in ladder.items():
@@ -138,12 +138,17 @@ for pos, grp in GROUPS.items():
             if b.empty:
                 continue
             Xa, Xb = fill(a, b, cols)
-            b["pred"] = b.fp_l3 if name == "naive" else make_pipeline(StandardScaler(), Ridge(alpha=20)).fit(Xa, a.fp).predict(Xb)
+            b["pred"] = (b.fp_l3 if name == "naive" else b.fp_season if name == "season"
+                         else make_pipeline(StandardScaler(), Ridge(alpha=20)).fit(Xa, a.fp).predict(Xb))
             out.append(b)
         P = pd.concat(out)
         scores[name] = dict(MAE=round((P.pred - P.fp).abs().mean(), 2),
                             rank=round(P.groupby("week").apply(lambda g: spearmanr(g.pred, g.fp).correlation, include_groups=False).mean(), 3))
-    best = min([k for k in scores if k != "naive"], key=lambda k: scores[k]["MAE"])
+    best = min([k for k in scores if k not in ("naive", "season")], key=lambda k: scores[k]["MAE"])
+    use_season = pos != "QB" and scores[best]["MAE"] > scores["season"]["MAE"] - 0.05
+    if use_season:
+        print(f"  !! {pos}: best model set '{best}' ({scores[best]['MAE']}) does not beat the season average "
+              f"({scores['season']['MAE']}); mean = season average, ranges from '{best}'")
     report.append((pos, len(tr), scores, best))
     # ---- final fit on full training season with the best feature set, plus quantiles
     cols = ladder[best]
@@ -168,7 +173,7 @@ for pos, grp in GROUPS.items():
     q10 = QuantileRegressor(quantile=0.10, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
     q50 = QuantileRegressor(quantile=0.50, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
     q90 = QuantileRegressor(quantile=0.90, alpha=0.01, solver="highs").fit(Xa_qs, tr.fp)
-    te["mean"] = (te.mean_pass + te.mean_rush) if pos == "QB" else med.predict(Xb_s)
+    te["mean"] = (te.mean_pass + te.mean_rush) if pos == "QB" else (te.fp_season if use_season else med.predict(Xb_s))
     te["p10"], te["p50"], te["p90"] = q10.predict(Xb_s), q50.predict(Xb_s), q90.predict(Xb_qs)
     # group contributions: sum of (standardized feature * coef) by group, relative to an average player
     contrib = pd.DataFrame(Xb_s * med.coef_, columns=cols, index=te.index)
@@ -177,6 +182,9 @@ for pos, grp in GROUPS.items():
         te["contrib_" + gname] = contrib[gc].sum(axis=1) if gc else 0.0
     te["baseline"] = med.intercept_
     te["model_used"] = best
+    if use_season:
+        te["contrib_usage"], te["contrib_environment"], te["contrib_matchup"] = te.fp_season - tr.fp.mean(), 0.0, 0.0
+        te["baseline"], te["model_used"] = tr.fp.mean(), "season"
     projections.append(te)
 
 P = pd.concat(projections)

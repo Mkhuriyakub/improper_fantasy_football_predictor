@@ -37,12 +37,19 @@ Per player, using only games before the target week:
 
 | Position | Mean model | Features used | Range (p10/p90) |
 |---|---|---|---|
-| RB | usage only | trailing usage, shares, role flags, script sensitivity | quantile regression on total pts; p90 adds opponent explosive-run susceptibility |
-| WR / TE | usage only | trailing usage, target/air-yard shares, aDOT, role flags, new-starter flag | quantile regression |
+| RB | **season average** (usage ridge did not beat it on 2025) | — | quantile regression on usage features; p90 adds opponent explosive-run susceptibility |
+| WR / TE | **season average** (same) | — | quantile regression on usage features |
 | QB | passing + rushing, summed | passing: trailing passing pts, attempts, QB efficiency, environment, absolute-scale pass-defense rating, pressure/sack/blitz; rushing: trailing rush yards/carries, spread, implied total | quantile regression on total pts |
 
-Environment and matchup features were tried for RB/WR/TE and rejected by
-validation; the quarterback is the only position where matchup earned a place.
+`project.py` now carries the season average in its validation ladder and
+falls back to it as the mean whenever the best feature set does not beat it
+by 0.05 MAE on the training season. As of week 10 that is every position but
+QB, where the split passing/rushing model beats the season average (6.88 vs
+7.16). Ranges still come from the quantile models, which are calibrated.
+
+Situational adjustments on top of the season average (streak, star regression,
+spread, teammate-out, new starter; `src/situational.py`) were tested on 2025
+and 2026 weeks 7–9: none improved MAE or rank beyond noise (±0.1 / ±0.03).
 
 ## Output columns
 
@@ -82,11 +89,11 @@ is close to noise for every model we've tested.
 Reset after week 9 (see FINDINGS.md headline): the model has not beaten a
 plain season average, so the validation ladder and the architecture change.
 
-1. Add `fp_season` as a baseline in the `project.py` ladder; every feature set
-   must beat it, not the 3-game average.
-2. Rebuild the mean as season average + situational adjustments (star
-   regression, streak regression, teammate-out sized from 2025, spread for
-   underdogs, returning-teammate flag). Compare to the ridge on 2025 and live.
+1. ~~Add `fp_season` as a baseline in the ladder~~ — done; RB/WR/TE means are
+   now the season average.
+2. ~~Situational adjustments~~ — tested, no gain (see FINDINGS). Keep the
+   flags (teammate out, returning teammate, new starter) as *notes* on the
+   board, not point adjustments.
 3. Keep the quantile models for ranges; move QB quantiles onto split inputs.
 4. Re-pull Vegas lines on game day (schedules file goes stale).
 5. Deferred: snap-share trend, QB–receiver reconciliation, def_tiers fade,

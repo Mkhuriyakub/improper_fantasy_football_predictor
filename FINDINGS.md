@@ -33,12 +33,17 @@ in aggregate: 2026 top-quartile RBs averaged 16.0 actual vs 17.9 projected and
 19.9 season average; WRs 18.1 vs 16.9 vs 19.5; QBs 18.1 vs 17.5 vs 19.3. ESPN
 won on individual players, not on a systematic lean.
 
-What this implies: the right architecture is a season average as the spine
-with a handful of situational adjustments (star regression, streak regression,
-teammate-out at a smaller size than the model learned, spread for underdogs,
-returning-teammate), not a ridge regression over usage features. The ranges
-(80% coverage: 80%, 86%) and the game-level work are where the model has
-shown value beyond the trivial baseline.
+Tested next (`src/situational.py`): season average + linear adjustments for
+streak, star regression, spread, teammate-out and new starter. On 2025 none
+beat the plain season average (RB 5.90–5.98 vs 5.85; WR 5.48–5.49 vs 5.51; TE
+5.23–5.36 vs 5.16); on 2026 weeks 7–9 the differences were ±0.1–0.4 MAE and
+±0.03 rank with no consistent direction. The subgroup gains above (stars,
+streaks) do not survive being applied to everyone.
+
+Decision: the mean projection for RB/WR/TE is now the season average;
+`project.py` only uses a model where it beats that baseline (QB: 6.88 vs
+7.16). The ranges (80% coverage: 80%, 86%) and the game-level work are where
+the model has shown value beyond the trivial baseline.
 
 ## Validated: these carry the projections
 
