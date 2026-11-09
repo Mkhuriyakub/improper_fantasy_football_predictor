@@ -1,12 +1,12 @@
 player,position,team,opp,p10,p50,p90,mean,espn,actual
 James Cook,RB,BUF,MIN,6.0,14.5,28.2,15.3,18.5,
-Braelon Allen,RB,NYJ,KC,4.3,11.2,24.8,12.2,9.0,
+Braelon Allen,RB,NYJ,KC,4.3,11.2,24.8,12.2,9.0,5.4
 TreVeyon Henderson,RB,NE,GB,0.8,4.8,12.9,7.3,6.0,
-Quinshon Judkins,RB,CLE,NO,4.1,11.1,22.9,13.1,13.8,
-Jonah Coleman,RB,DEN,CAR,2.6,10.0,21.8,12.0,14.4,
+Quinshon Judkins,RB,CLE,NO,4.1,11.1,22.9,13.1,13.8,5.5
+Jonah Coleman,RB,DEN,CAR,2.6,10.0,21.8,12.0,14.4,18.8
 Justin Jefferson,WR,MIN,BUF,3.6,12.0,23.6,13.5,18.2,
-Nico Collins,WR,HOU,LAC,2.7,10.5,22.8,11.9,13.9,
+Nico Collins,WR,HOU,LAC,2.7,10.5,22.8,11.9,13.9,15.5
 Ladd McConkey,WR,LAC,HOU,1.2,6.6,17.4,8.1,10.8,
-Makai Lemon,WR,PHI,NYG,2.4,8.5,18.0,9.9,10.5,
-Omar Cooper Jr.,WR,NYJ,KC,3.2,11.6,24.5,13.2,9.3,
-Brock Bowers,TE,LV,SF,5.0,14.9,26.6,17.5,18.2,
+Makai Lemon,WR,PHI,NYG,2.4,8.5,18.0,9.9,10.5,12.100000000000001
+Omar Cooper Jr.,WR,NYJ,KC,3.2,11.6,24.5,13.2,9.3,13.8
+Brock Bowers,TE,LV,SF,5.0,14.9,26.6,17.5,18.2,22.3

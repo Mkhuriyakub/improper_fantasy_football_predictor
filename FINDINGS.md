@@ -114,10 +114,15 @@ landed inside the 80% range (85/80/73/81% by position).
 | 8 TNF | 9 GB/CAR players | 5.5 | 5.6 | 15/16 in range; ESPN "Shaky" WRs scored 55.5 combined |
 | 8 | 15 QBs | 7.6 | **7.0** | ESPN closer on 8/15; our regression on top QBs too heavy |
 | 8 MNF | CHI/SEA | all in range | — | Narrative wrong (possession), numbers fine |
+| 9 | 83 board players (BUF/MIN pending) | 6.2 (mean), 6.0 (median) | — | Season average 5.9 beat the model; naive 7.1. Coverage 86%. TE rank 0.75, QB 0.28 |
+| 9 | 7 roster players | 4.6 | **4.0** | ESPN higher on Bowers/Coleman/Collins and right each time |
+| 9 | 13 game winners | 13/13 | Vegas 12/13 | EPA-margin + starter check; only GB@NE differed from the closing line |
 
-Open question after 3 weeks: the model regresses high-usage stars (Jefferson,
-Cook, top QBs) harder than ESPN and has lost on them two weeks running. 2025
-said the regression was right; 2026 so far says otherwise.
+Open question after 4 weeks: the model regresses high-usage stars harder than
+ESPN and has now lost to ESPN three weeks running on tracked players, and in
+week 9 lost to the plain season average across the board. 2025 said the
+regression was right; 2026 says otherwise. The "soft run D" ceiling flag went
+1-for-7 on p90 hits in week 9.
 
 ## Known gaps
 
@@ -133,4 +138,9 @@ said the regression was right; 2026 so far says otherwise.
 - Prior-season weight in the defense trait is too heavy for defenses that
   changed (Tampa Bay 2026 graded "above avg" despite historic raw numbers).
 - Injury statuses are read from the Wednesday report; a Saturday re-run is
-  needed every week.
+  needed every week. The model flags a teammate who is Out but not one who is
+  *returning* (Breece Hall, week 9: Allen projected as lead back, got 8 carries).
+- Vegas lines come from the schedules file and go stale; the week 9 PHI line
+  moved from −3.5 to +3.5 after QB news. Re-pull lines on game day.
+- Custom-scoring conversion (`src/yahoo_convert.py`) scales ceilings by the PPR
+  ratio, which understates TD-driven ceilings in TD-heavy formats.
