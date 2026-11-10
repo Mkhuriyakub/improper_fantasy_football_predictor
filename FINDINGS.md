@@ -186,6 +186,12 @@ landed inside the 80% range (85/80/73/81% by position).
   repeat within a season (0.17, −0.02); the WR version is weak (0.44) and
   worth ~+0.8 pts in real-time use with no increase in smash rate.
 - Explosive-pass susceptibility of defenses for receivers: no gain.
+- Receiver target-profile features from play-by-play (season-to-date deep-
+  target rate, end-zone targets/g, red-zone target share, middle-of-field and
+  short rates, YAC per reception, YAC over expected): no gain for WR or TE on
+  2024/2025, slightly worse in every combination. Air-yards share and aDOT
+  already carry what matters. Route alignment and route depth for untargeted
+  routes are not in free in-season data.
 - Opponent's offensive strength as a volume input (the "forced aggression"
   idea): r=+0.05, no gain. Teams throw more against good offenses only via
   script, which the spread already carries.
