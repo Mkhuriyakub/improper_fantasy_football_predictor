@@ -177,6 +177,30 @@ landed inside the 80% range (85/80/73/81% by position).
 - `src/comps.py` returns the ten closest historical comps (pedigree,
   experience, 3-week touches and efficiency) and their next-four-game line.
 
+**Receiver role growth: air-yards share and pedigree predict who keeps an
+expanded role; depth, end-zone targets and YAC don't.** (2019–25 play-by-play;
+184 emergences = target share < 14% over the prior 8 games, then three
+straight weeks ≥ 16%; and a broad regression on 11,734 receiver-weeks.)
+
+- Base rate: during the three weeks 22% target share and 12.2 PPR/g; the next
+  four games 17% and 9.1. Only 16% of emergences grow further. The role
+  usually settles about halfway back.
+- What predicts the next four games' share (R² 0.21): air-yards share during
+  the run (+, t=3.7) *and* aDOT (−, t=3.5) together — i.e. at a given depth,
+  the receiver who gets more of the team's intended yards keeps the role; a
+  high aDOT with a modest air-yards share is a low-volume deep role that
+  recedes. Experience (−, t=2.9): younger players keep growing. Top-64 pick:
+  +1.1 share points in the emergence sample (n.s.) and +1.3 share points
+  with t=12.7 in the all-weeks regression. Day-3/UDFA emergences: 7.4 PPR/g
+  afterwards vs 9.3–10.1 for drafted receivers; 7% grew further.
+- Not predictive of growth: deep-target rate, end-zone targets/g, YAC over
+  expected, red-zone target share. EPA per target predicts share growth in
+  the all-weeks regression (+0.5 share points per sd) but not within the
+  emergence sample.
+- `python src/comps.py 2026 --wr "Name"` gives the growth-model forecast
+  (next-4 share and PPR/g) plus ten comps matched on pedigree, experience,
+  target share, air-yards share and aDOT.
+
 ## Tested and rejected: these don't improve weekly projections
 
 - Team-level line metrics (adjusted line yards, stuff rate, sack rate,

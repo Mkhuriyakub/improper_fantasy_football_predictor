@@ -95,8 +95,8 @@ plain season average, so the validation ladder and the architecture change.
 1. ~~Season-average baseline in the ladder~~ — done; validation now scored on
    top + emerging players (see FINDINGS, "Measured on the players that matter").
 2. Returning-teammate flag (Hall/Allen); test on 2024+2025 top+emerging.
-3. Extend the comps tool (`src/comps.py`) to WR/TE and to the "returning
-   starter" case; surface comps on the weekly board for emerging players.
+3. ~~Extend comps to WR/TE~~ — done (`--wr`). Add the "returning starter"
+   case; surface the growth forecast on the weekly board for emerging players.
 3. Keep the quantile models for ranges; move QB quantiles onto split inputs.
 4. Re-pull Vegas lines on game day (schedules file goes stale).
 5. Deferred: snap-share trend, QB–receiver reconciliation, def_tiers fade,
