@@ -36,7 +36,12 @@ dw = grid.merge(dw, how="left").fillna({"ex": 0, "car": 0}).sort_values(["deftea
 dw["pex"] = dw.groupby("defteam").ex.transform(lambda s: s.shift().cumsum()).fillna(0)
 dw["pcar"] = dw.groupby("defteam").car.transform(lambda s: s.shift().cumsum()).fillna(0)
 dw = dw.merge(dprev, left_on="defteam", right_index=True)
-dw["def_expl_sus"] = (dw.pex + 0.5 * dw.dex + lg * 100) / (dw.pcar + 0.5 * dw.dc + 100)
+# prior-season weight: half by default, fading as the current sample grows; zero for a defense with a new coordinator
+coach = ROOT / "data" / "coaching_changes.csv"
+new_dc = set(pd.read_csv(coach).query("season == @SEASON and new_dc == 1").team) if coach.exists() else set()
+w_prev = 0.5 * (100 / (100 + dw.pcar)).clip(lower=0.15)
+w_prev = w_prev.where(~dw.defteam.isin(new_dc), 0.0)
+dw["def_expl_sus"] = (dw.pex + w_prev * dw.dex + lg * 100) / (dw.pcar + w_prev * dw.dc + 100)
 # tercile label by week (soft = most susceptible third)
 dw["def_expl_tercile"] = dw.groupby("week").def_expl_sus.transform(lambda s: pd.qcut(s, 3, labels=["tough", "mid", "soft"]).astype(str))
 

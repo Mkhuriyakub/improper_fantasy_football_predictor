@@ -99,5 +99,10 @@ plain season average, so the validation ladder and the architecture change.
    case; surface the growth forecast on the weekly board for emerging players.
 3. Keep the quantile models for ranges; move QB quantiles onto split inputs.
 4. Re-pull Vegas lines on game day (schedules file goes stale).
+5. `data/coaching_changes.csv` (season, team, new_dc) zeroes the prior-season
+   weight in the explosive-run trait for defenses with a new coordinator; the
+   weight otherwise fades as the current-season sample grows (half weight at
+   0 carries, ~15% by 300). Same treatment is still to be applied in
+   `def_tiers.py`.
 5. Deferred: snap-share trend, QB–receiver reconciliation, def_tiers fade,
    explosive trait on the mean.
