@@ -245,7 +245,7 @@ straight weeks ≥ 16%; and a broad regression on 11,734 receiver-weeks.)
 | 8 MNF | CHI/SEA | all in range | — | Narrative wrong (possession), numbers fine |
 | 9 | 83 board players (BUF/MIN pending) | 6.2 (mean), 6.0 (median) | — | Season average 5.9 beat the model; naive 7.1. Coverage 86%. TE rank 0.75, QB 0.28 |
 | 9 | 7 roster players | 4.6 | **4.0** | ESPN higher on Bowers/Coleman/Collins and right each time |
-| 9 | 13 game winners | 13/13 | Vegas 12/13 | EPA-margin + starter check; only GB@NE differed from the closing line |
+| 9 | 14 game winners | 14/14 | Vegas 13/14 | EPA-margin + starter check; only GB@NE differed from the closing line |
 
 Open question after 4 weeks: the model regresses high-usage stars harder than
 ESPN and has now lost to ESPN three weeks running on tracked players, and in
