@@ -218,6 +218,29 @@ for w in weeks:
         ))
 
 feat = pd.DataFrame(rows)
+
+# manual overrides for news the injury file doesn't carry yet: data/overrides_{season}.csv
+# columns: week, player, status (Out) | week, team, new_qb (1) -> flags pass catchers as new-starter weeks
+_ov = ROOT / "data" / f"overrides_{SEASON}.csv"
+if _ov.exists():
+    ov = pd.read_csv(_ov)
+    for r in ov[ov.get("status", pd.Series(dtype=str)).notna()].itertuples():
+        m = (feat.week == r.week) & (feat.player == r.player)
+        feat.loc[m, "status"] = r.status
+        if r.status == "Out" and m.any():
+            team, pos = feat.loc[m, "team"].iat[0], feat.loc[m, "position"].iat[0]
+            tm = (feat.week == r.week) & (feat.team == team) & ~m
+            if pos == "RB" and feat.loc[m, "is_lead_back"].iat[0] == 1:
+                feat.loc[tm, "lead_back_out"] = 1
+            if pos in ("WR", "TE") and feat.loc[m, "is_lead_receiver"].iat[0] == 1:
+                feat.loc[tm, "lead_receiver_out"] = 1
+    if "new_qb" in ov:
+        for r in ov[ov.new_qb == 1].itertuples():
+            tm = (feat.week == r.week) & (feat.team == r.team) & (feat.position != "QB")
+            for c in ("new_starter", "qb_changed"):
+                if c in feat:
+                    feat.loc[tm, c] = 1
+    print(f"overrides applied: {len(ov)} rows")
 feat["p_trail_proxy"] = 1 / (1 + np.exp(-feat.spread / 6))
 feat["script_risk"] = feat.p_trail_proxy * feat.script_sens
 feat["pace_mismatch"] = feat.opp_off_plays_per_drive - feat.off_plays_per_drive

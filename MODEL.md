@@ -12,11 +12,16 @@ python src/def_tiers.py 2026            # pass-defense rating on the absolute 20
 python src/pedigree.py 2026             # draft capital, experience, prior-season efficiency (needs player_stats 2018+)
 python src/features.py 2026 <week>      # walk-forward feature table for the target week
 python src/project.py 2025 2026 <week> [player names...]   # fit on 2025, project the week
+python src/board.py 2026 <week>         # top 20/30/30/20 with tiers and utilization labels -> results/board_*.csv
 ```
 
 Run the trait builders and features for 2025 once (`... 2025` with no week) to
 produce the training table. `project.py` prints the 2025 walk-forward
 validation each time it runs, so a change that hurts accuracy is visible.
+
+`data/overrides_{season}.csv` carries news the injury file doesn't have yet
+(week, player, status=Out; or week, team, new_qb=1) and is applied by
+`features.py` every run, including the teammate-out flags.
 
 ## Inputs (all free, nflverse)
 
