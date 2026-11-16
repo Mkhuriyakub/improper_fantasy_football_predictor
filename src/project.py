@@ -89,6 +89,21 @@ def add_pedigree(df, season):
 
 
 tr_all, te_all = add_pedigree(tr_all, TRAIN), add_pedigree(te_all, SEASON)
+
+
+def add_def_effect(df, season):
+    """Each defense's individual, walk-forward effect on opposing QBs vs their own averages (src/def_effect.py),
+    plus its blitz and pressure rates. Applied structurally (not learned): DEF_C points per EPA/dropback of effect."""
+    d = pd.read_parquet(ROOT / "results" / f"def_effect_{season}.parquet").rename(columns={"defteam": "opp"})
+    df = df.merge(d[["opp", "week", "def_qb_delta", "def_blitz", "def_pressure"]], on=["opp", "week"], how="left")
+    df["def_qb_delta"] = df.def_qb_delta.fillna(0)
+    return df
+
+
+tr_all, te_all = add_def_effect(tr_all, TRAIN), add_def_effect(te_all, SEASON)
+# Validated 2024+2025 on top+emerging: c=10 lowers MAE for WR/TE/RB in 5 of 6 season-position cells and removes most of
+# the -1 to -2.5 under-performance of pass catchers against the toughest 15% of defenses. Ridge learns it at half strength.
+DEF_C = {"WR": 10.0, "TE": 10.0, "RB": 10.0, "QB": 10.0}
 PEDIGREE = ["top64", "log_pick", "exp", "prior_fp_per_opp", "prior_opp_pg"]
 _QB_PASS_BASE = ["pass_fp_l3", "pass_fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "qb_epa"]
 _QB_PASS_TAIL = [
@@ -152,7 +167,7 @@ for pos, grp in GROUPS.items():
                 continue
             Xa, Xb = fill(a, b, cols)
             b["pred"] = (b.fp_l3 if name == "naive" else b.fp_season if name == "season"
-                         else make_pipeline(StandardScaler(), Ridge(alpha=20)).fit(Xa, a.fp).predict(Xb))
+                         else make_pipeline(StandardScaler(), Ridge(alpha=20)).fit(Xa, a.fp).predict(Xb) + DEF_C[pos] * b.def_qb_delta)
             out.append(b)
         P = pd.concat(out)
         # score on the players that matter: top-N by season average plus "emerging" (hot and now ranked top-N on trailing)
@@ -193,8 +208,14 @@ for pos, grp in GROUPS.items():
     q10 = QuantileRegressor(quantile=0.10, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
     q50 = QuantileRegressor(quantile=0.50, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
     q90 = QuantileRegressor(quantile=0.90, alpha=0.01, solver="highs").fit(Xa_qs, tr.fp)
-    te["mean"] = (te.mean_pass + te.mean_rush) if pos == "QB" else (te.fp_season if use_season else med.predict(Xb_s))
+    # structural defense adjustment: the opponent's measured effect on quarterbacks, applied to the whole passing game
+    te["def_adj"] = DEF_C[pos] * te.def_qb_delta
+    te["mean"] = ((te.mean_pass + te.mean_rush) if pos == "QB" else (te.fp_season if use_season else med.predict(Xb_s))) + te.def_adj
+    if pos == "QB":
+        te["mean_pass"] = te.mean_pass + te.def_adj
     te["p10"], te["p50"], te["p90"] = q10.predict(Xb_s), q50.predict(Xb_s), q90.predict(Xb_qs)
+    for c in ("p10", "p50", "p90"):
+        te[c] = te[c] + te.def_adj
     # group contributions: sum of (standardized feature * coef) by group, relative to an average player
     contrib = pd.DataFrame(Xb_s * med.coef_, columns=cols, index=te.index)
     for gname, gcols in {**grp, "pedigree": PEDIGREE}.items():
@@ -232,7 +253,7 @@ for pos, n, sc, best in report:
     print(f"  {pos} (n={n}): " + " | ".join(f"{k}: {v['MAE']} / {v['rank']}" for k, v in sc.items()) + f"   -> using '{best}'")
 pd.set_option("display.width", 250)
 P["ceiling_flag"] = np.where((P.position == "RB") & (P.def_expl_tercile == "soft"), "soft run D", "")
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
     sel = P[P.player.isin(NAMES)]
 else:

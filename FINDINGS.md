@@ -201,6 +201,28 @@ straight weeks ≥ 16%; and a broad regression on 11,734 receiver-weeks.)
   (next-4 share and PPR/g) plus ten comps matched on pedigree, experience,
   target share, air-yards share and aDOT.
 
+**Each defense's individual effect on quarterbacks is the matchup input that
+works, applied structurally rather than learned.** `src/def_effect.py`
+measures, for each defense and week, how every quarterback it has faced
+played against it versus his own average in his other games (dropback-
+weighted, 200-dropback prior, prior season fading with sample, zero for a new
+coordinator). It is an individual number: Minnesota 2026 through week 9 is
+−0.25 EPA/dropback raw (every QB it faced below his norm; −0.15 shrunk),
+Tampa Bay −0.32 raw. In 2025 the quintiles are monotonic: QBs threw 1.4 pts
+below their own average vs the toughest fifth and 2.3 above vs the softest.
+
+Ridge regression learns this at about half strength (still +1.6 too high for
+top QBs vs the toughest 15%), so it is applied as a fixed adjustment of 10
+points per EPA/dropback of effect to the QB's passing projection and to every
+pass catcher on that offense (the team effect passes through; which receiver
+absorbs it is not predictable). Validated 2024+2025 on top+emerging: pass
+catchers vs the toughest 15% of defenses were under-projected by 1.3–2.5 pts
+(TE both years, RB/WR 2025); c=10 lowers MAE in 5 of 6 position-season cells
+and on the 2025 ladder at every position (QB 6.88→6.64, WR 6.22→6.14, TE
+5.70→5.48, RB 6.66→6.65). Minnesota now costs Green Bay's passing game 1.5
+points per player; the profile behind it (73% blitz rate, 25% pressure, worst
+short/intermediate CPOE allowed, −0.58 EPA in the red zone) is on the board.
+
 ## Tested and rejected: these don't improve weekly projections
 
 - Team-level line metrics (adjusted line yards, stuff rate, sack rate,

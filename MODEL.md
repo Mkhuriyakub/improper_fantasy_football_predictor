@@ -9,6 +9,7 @@ python src/load_data.py 2026            # refresh raw data (pbp, FTN, stats, sch
 python src/expl_traits.py 2026          # explosive-run traits (defense + rusher), prior-season prior
 python src/qb_traits.py 2026            # each team's expected starter and his profile, walk-forward
 python src/def_tiers.py 2026            # pass-defense rating on the absolute 2000-25 scale
+python src/def_effect.py 2026           # each defense's individual effect on opposing QBs vs their own averages
 python src/pedigree.py 2026             # draft capital, experience, prior-season efficiency (needs player_stats 2018+)
 python src/features.py 2026 <week>      # walk-forward feature table for the target week
 python src/project.py 2025 2026 <week> [player names...]   # fit on 2025, project the week
@@ -67,6 +68,10 @@ coverage. `mean` — expected value, the number comparable to ESPN. `ceiling_fla
 — opponent pass defense on the absolute scale (relevant to QBs). `shootout` —
 1 when both offenses are top-third, spread ≤ 3.5, no top-7 pass defense.
 `contrib_usage / environment / matchup` — points attributable to each group.
+`def_qb_delta` — the opponent's individual effect on QBs (EPA/dropback vs
+their own averages, shrunk); `def_adj` — the points it adds to or removes from
+this player (10 × def_qb_delta, applied to mean and range); `def_blitz` — the
+opponent's blitz rate.
 
 ## Conventions
 
