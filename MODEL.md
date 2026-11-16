@@ -97,6 +97,63 @@ opponent's blitz rate.
 QB rank accuracy is the weakest; separating one starter's week from another's
 is close to noise for every model we've tested.
 
+
+## Assessment criteria by position (as of week 11, 2026)
+
+Every position shares the same frame: **usage** (how much), **the player**
+(what he does with it), **the offense** (size of the pie), **the opponent**
+(applied to the whole passing game, never per receiver), and **range** (floor
+and ceiling, fit separately from the mean). The validation ladder scores each
+feature set on top-N + emerging players against a season-average baseline and
+keeps whichever wins; the current selection is noted per position.
+
+### Quarterback — split model, passing + rushing (ladder: "full")
+- **Passing volume/efficiency:** passing pts last 3 (snap-weighted) and season, attempts, pass yards, pass TDs last 3; his own EPA/dropback (walk-forward).
+- **Offense:** dropbacks/g, pass success rate, red-zone plays/g, plays/g, pass rate over expected, plays/drive, pass EPA.
+- **Game:** spread, implied total, total, dome, opponent pace and three-and-out rate.
+- **Opponent (learned):** absolute-scale pass-defense rating, yards/att allowed, pressure, sack and blitz rates.
+- **Opponent (structural):** + 10 × the defense's individual effect on QBs (vs their own averages). This is the Minnesota number.
+- **Rushing (separate ridge):** rush yards/carries/rush pts last 3 and season, spread, implied total, red-zone plays, opponent rush EPA and line yards allowed. Matchup-proof floor; summed with passing.
+- **Not used:** pedigree (no gain), QB × defense interaction (no gain).
+- **Range:** quantile models on total-points inputs (known inconsistency with the split mean), shifted by the defense adjustment.
+- **Diagnostics on the board:** success rate and low-percentage-throw rate next to EPA (repeatability), new-starter flag.
+
+### Running back (ladder: "usage")
+- **Usage:** touches, carries, targets last 3 (snap-weighted); touch share; goal-line and red-zone share; lead-back flag; lead back Out this week (teammate absence, the largest predictable volume event).
+- **Script:** player-specific script sensitivity (share when trailing vs close) × probability of trailing from the spread.
+- **The player:** draft pick, experience, prior-season PPR per opportunity (shrunk, 150-opp prior), prior-season opportunities/g. Separates "thrust into volume" from "earned it".
+- **Opponent (structural):** + 10 × the defense's QB effect (receiving work is part of the passing game).
+- **Ceiling only:** opponent's explosive-run susceptibility (prior season fades with sample; zero for a new DC) lifts/lowers p90, never the mean. "Soft run D" flag.
+- **Not used in the mean:** environment and line/scheme metrics (rejected), snap share (redundant with snap-weighted usage), the back's own explosive history (not stable).
+- **Labels:** utilization (snap share, carry share, target share), emerging flag, comps for a back new to volume.
+
+### Wide receiver (ladder currently: "usage+env")
+- **Usage:** targets, receptions, receiving yards last 3 (snap-weighted); target share; air-yards share; aDOT; red-zone share; lead-receiver flag; lead receiver Out; carries (gadget usage).
+- **Quarterback change:** new-starter flag (−2.6 pts over-projection otherwise; who the new QB is doesn't matter).
+- **The player:** pedigree as for RBs.
+- **Offense/game (environment):** spread, implied total, total, dome, pace, pass rate over expected, dropbacks/g, pass success.
+- **Opponent (structural):** + 10 × the defense's QB effect, equal for every receiver on the offense.
+- **Not used:** defense-vs-WR points allowed, explosive-pass susceptibility, QB traits, target-depth/location/YAC profiles, shadow corners (not in free data). Validated as adding nothing to the weekly number.
+- **Range:** quantile models, shifted by the defense adjustment.
+- **Labels/growth:** utilization, emerging flag; for an emerging receiver, the growth model (air-yards share and aDOT jointly, youth, draft capital) and comps.
+
+### Tight end (ladder: "usage")
+- Same as WR, plus **snap share last game** (the one position where it adds).
+- Opponent TE target share allowed was tested and rejected.
+
+### Team / game layer (feeds all of the above)
+- Vegas spread, total, implied totals (re-pulled on game day).
+- Shootout flag: both offenses top-third, spread ≤ 3.5, no top-7 pass defense.
+- Defensive profiles: blitz rate, pressure rate, EPA allowed by depth, location, down and red zone (`qb_situations`/`def_effect` outputs), explosive-run susceptibility, absolute-scale pass-defense tier.
+- Game winners: Vegas line + season and last-4 EPA margins + starting-QB and key-absence check.
+- Manual inputs: `data/overrides_{season}.csv` (Out, new QB), `data/coaching_changes.csv` (new DC).
+
+### What is deliberately *not* in any position's mean
+Line/scheme aggregates, defense-vs-position, coaching distribution tendencies,
+opponent-based game-plan shifts, shadow corners, receiver target-profile
+splits, snap share for RB/WR, situational/momentum QB splits. Each was tested
+on 2024–2025 against the season-average baseline on top+emerging players.
+
 ## Next changes, in order
 
 Reset after week 9 (see FINDINGS.md headline): the model has not beaten a
