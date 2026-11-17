@@ -10,6 +10,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import nflreadpy as nfl
 from scipy.stats import spearmanr
 from sklearn.linear_model import Ridge, QuantileRegressor
 from sklearn.pipeline import make_pipeline
@@ -101,11 +102,35 @@ def add_def_effect(df, season):
 
 
 tr_all, te_all = add_def_effect(tr_all, TRAIN), add_def_effect(te_all, SEASON)
+
+
+def add_cpoe(df, season):
+    """Walk-forward season-to-date completion % over expected (Next Gen Stats), attempt-weighted, prior weeks only.
+    Tested 2024+2025 vs ESPN QBR, passer rating, NGS aggressiveness/time-to-throw, success rate: CPOE is the only rating
+    that improves the QB passing model beyond the QB's own EPA (MAE 5.95->5.93, 5.99->5.94 on top+emerging)."""
+    f = ROOT / "data" / "ngs_passing.parquet"
+    n = pd.read_parquet(f) if f.exists() else nfl.load_nextgen_stats([season], stat_type="passing").to_pandas()
+    n = n[(n.season == season) & (n.week > 0)].sort_values("week").copy()
+    n["x"] = n.completion_percentage_above_expectation * n.attempts
+    cum_x = n.groupby("player_gsis_id").x.cumsum() - n.x
+    cum_a = n.groupby("player_gsis_id").attempts.cumsum() - n.attempts
+    n["cpoe_std"] = cum_x / (cum_a + 40)  # 40-attempt prior at 0
+    n = n[["player_gsis_id", "week", "cpoe_std"]].rename(columns={"player_gsis_id": "player_id"})
+    # a QB's value for week W is the row for his most recent game before W; carry forward through byes/misses
+    full = pd.MultiIndex.from_product([n.player_id.unique(), range(1, 19)], names=["player_id", "week"]).to_frame(index=False)
+    n = full.merge(n, how="left").sort_values(["player_id", "week"])
+    n["cpoe_std"] = n.groupby("player_id").cpoe_std.ffill()
+    out = df.merge(n, on=["player_id", "week"], how="left")
+    out["cpoe_std"] = out.cpoe_std.fillna(0)
+    return out
+
+
+tr_all, te_all = add_cpoe(tr_all, TRAIN), add_cpoe(te_all, SEASON)
 # Validated 2024+2025 on top+emerging: c=10 lowers MAE for WR/TE/RB in 5 of 6 season-position cells and removes most of
 # the -1 to -2.5 under-performance of pass catchers against the toughest 15% of defenses. Ridge learns it at half strength.
 DEF_C = {"WR": 10.0, "TE": 10.0, "RB": 10.0, "QB": 10.0}
 PEDIGREE = ["top64", "log_pick", "exp", "prior_fp_per_opp", "prior_opp_pg"]
-_QB_PASS_BASE = ["pass_fp_l3", "pass_fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "qb_epa"]
+_QB_PASS_BASE = ["pass_fp_l3", "pass_fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "qb_epa", "cpoe_std"]
 _QB_PASS_TAIL = [
     "off_dropbacks_pg", "off_pass_sr", "off_rz_plays_pg", "def_rel_epa", "opp_def_ypa_allowed", "opp_def_pressure_rate",
     "opp_def_sack_rate", "opp_def_blitz_rate"]  # def_rel_epa: absolute-scale pass D rating (validated 2025: better rank, less bias vs strong D)

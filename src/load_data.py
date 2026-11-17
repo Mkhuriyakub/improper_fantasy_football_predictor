@@ -34,3 +34,14 @@ for name, fn in LOADERS.items():
         print(f"{name:14s} {df.shape}")
     except Exception as e:  # participation lags a season; keep going
         print(f"{name:14s} unavailable: {e}")
+
+# Next Gen Stats passing (CPOE etc.), all seasons needed by the QB model
+try:
+    import nflreadpy as _nfl, pandas as _pd
+    _n = _nfl.load_nextgen_stats([2024, 2025, SEASON] if SEASON >= 2026 else [SEASON], stat_type="passing").to_pandas()
+    _old = D / "ngs_passing.parquet"
+    if _old.exists():
+        _n = _pd.concat([_pd.read_parquet(_old)[lambda d: ~d.season.isin(_n.season.unique())], _n])
+    _n.to_parquet(_old, index=False); print("ngs_passing: ok", sorted(_n.season.unique()))
+except Exception as e:
+    print("ngs_passing: skipped", e)

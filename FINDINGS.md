@@ -245,6 +245,15 @@ short/intermediate CPOE allowed, −0.58 EPA in the red zone) is on the board.
   gain. The receiver's own trailing stats already carry them.
 - QB quality × defense interaction in the QB model: not significant; made the
   model slightly worse.
+- Quarterback rating systems as inputs (2024+2025, top+emerging): ESPN QBR
+  (season-to-date, play-weighted) adds nothing over the QB's own EPA/dropback,
+  swapped in or added; passer rating, NGS aggressiveness, time to throw and
+  intended air yards: nothing. **CPOE** (Next Gen Stats, attempt-weighted) is
+  the one rating that helps: passing MAE 5.95→5.93 (2024), 5.99→5.94 (2025);
+  adopted. Success rate is the single best trailing predictor of next-game
+  passing points (r 0.29/0.26 vs EPA 0.25/0.19 and QBR 0.18/0.22), confirming
+  that repeatability beats magnitude, but adds nothing once the model's other
+  inputs are present.
 - Coaching tendencies as a predictor of target/carry distribution: the
   distribution stays with the roster, not the coach. Coaches who moved teams
   showed negative carryover on RB1/WR1 shares. Pass rate and TE usage are the
