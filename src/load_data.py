@@ -39,7 +39,7 @@ for name, fn in LOADERS.items():
 try:
     import nflreadpy as _nfl, pandas as _pd
     _n = _nfl.load_nextgen_stats([2024, 2025, SEASON] if SEASON >= 2026 else [SEASON], stat_type="passing").to_pandas()
-    _old = D / "ngs_passing.parquet"
+    _old = OUT / "ngs_passing.parquet"
     if _old.exists():
         _n = _pd.concat([_pd.read_parquet(_old)[lambda d: ~d.season.isin(_n.season.unique())], _n])
     _n.to_parquet(_old, index=False); print("ngs_passing: ok", sorted(_n.season.unique()))
