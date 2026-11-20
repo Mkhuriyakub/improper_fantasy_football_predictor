@@ -1,0 +1,278 @@
+<title>Improper Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Archivo:wght@600;700&display=swap">
+<style>
+/* Layout: a scoreboard-style board. Dense tabular rows, a right-hand drawer for the "why", a games strip. Numbers in mono. */
+:root{
+  --bg:#f6f5f1; --panel:#ffffff; --line:#dedbd2; --fg:#1b1a17; --muted:#6b675d; --accent:#1f5f3a; --accent-ink:#ffffff;
+  --good:#2b7a4b; --warn:#b7791f; --bad:#b23a2e; --band:#ebe8df; --chip:#eceae2; --row-hover:#f0eee6;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; --font-display:"Archivo","IBM Plex Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#15171a; --panel:#1d2024; --line:#30343a; --fg:#ebe9e3; --muted:#9a9790; --accent:#5fc08a; --accent-ink:#0f1f16; --good:#5fc08a; --warn:#e0a640; --bad:#e2695c; --band:#23272c; --chip:#2a2e34; --row-hover:#24282d; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#15171a; --panel:#1d2024; --line:#30343a; --fg:#ebe9e3; --muted:#9a9790; --accent:#5fc08a; --accent-ink:#0f1f16; --good:#5fc08a; --warn:#e0a640; --bad:#e2695c; --band:#23272c; --chip:#2a2e34; --row-hover:#24282d; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.45;margin:0}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 32px;max-width:1280px;margin:0 auto}
+header.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 20px;padding-block:18px 10px;border-bottom:1px solid var(--line)}
+header.top h1{font-family:var(--font-display);font-size:22px;letter-spacing:.01em;margin:0}
+header.top .meta{color:var(--muted);font-family:var(--font-mono);font-size:12px}
+nav.views{display:flex;gap:4px;margin-left:auto}
+nav.views button{background:none;border:1px solid transparent;border-radius:6px;padding:6px 12px;font:inherit;font-weight:500;color:var(--muted);cursor:pointer}
+nav.views button[aria-current="true"]{color:var(--fg);border-color:var(--line);background:var(--panel)}
+nav.views button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{background:var(--panel);border:0;padding:6px 12px;font:inherit;font-weight:500;color:var(--muted);cursor:pointer;font-family:var(--font-mono);font-size:12px;letter-spacing:.06em}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.controls input[type=search],.controls select{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg);min-width:0}
+.controls label{color:var(--muted);font-size:12px;display:inline-flex;align-items:center;gap:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;background:var(--chip);color:var(--fg);cursor:pointer;font-family:var(--font-mono)}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.layout.has-drawer{grid-template-columns:minmax(0,1fr) 360px}
+@media (max-width:900px){.layout.has-drawer{grid-template-columns:minmax(0,1fr)}}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel);min-width:0}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:7px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;background:var(--band);position:sticky;top:0;cursor:pointer;user-select:none}
+th.l,td.l{text-align:left}
+th[aria-sort]::after{content:" ↓";color:var(--accent)} th[aria-sort="ascending"]::after{content:" ↑"}
+tbody tr{cursor:pointer} tbody tr:hover{background:var(--row-hover)} tbody tr[aria-selected="true"]{background:var(--row-hover);box-shadow:inset 3px 0 0 var(--accent)}
+td.num{font-family:var(--font-mono);font-size:13px}
+td.proj{font-weight:600}
+.tier{font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;color:var(--muted)}
+.util{display:inline-block;min-width:44px;text-align:center;border-radius:4px;padding:1px 6px;font-size:11px;font-family:var(--font-mono)}
+.util.elite{background:var(--good);color:#fff}.util.high{background:color-mix(in srgb,var(--good) 35%,transparent)}.util.mid{background:var(--chip)}.util.low{background:color-mix(in srgb,var(--bad) 25%,transparent)}
+.flag{display:inline-block;border-radius:4px;padding:1px 6px;font-size:11px;margin-left:4px;font-family:var(--font-mono)}
+.flag.warn{background:color-mix(in srgb,var(--warn) 25%,transparent)}.flag.bad{background:color-mix(in srgb,var(--bad) 25%,transparent)}.flag.good{background:color-mix(in srgb,var(--good) 25%,transparent)}
+.range{display:inline-block;width:110px;height:8px;position:relative;vertical-align:middle;background:var(--band);border-radius:4px}
+.range i{position:absolute;top:0;height:8px;background:color-mix(in srgb,var(--accent) 45%,transparent);border-radius:4px}
+.range b{position:absolute;top:-2px;width:2px;height:12px;background:var(--accent)}
+.status{font-size:11px;color:var(--muted)}
+.drawer{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);align-self:start;max-height:calc(100vh - 40px);overflow:auto;min-width:0}
+.drawer h2{font-family:var(--font-display);font-size:20px;margin:0 0 2px}
+.drawer .sub{color:var(--muted);font-size:12px;margin-bottom:12px;font-family:var(--font-mono)}
+.drawer .close{float:right;background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);font:inherit;padding:2px 8px;cursor:pointer}
+.kv{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:13px;margin:0}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--font-mono);text-align:right}
+.drawer h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px;font-weight:500}
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:120px 1fr 48px;align-items:center;gap:8px;font-size:12px}
+.bar .track{height:8px;background:var(--band);border-radius:4px;position:relative}
+.bar .track i{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--accent)}
+.bar .track i.neg{background:var(--bad)}
+.bar .v{font-family:var(--font-mono);text-align:right}
+.note{font-size:12px;color:var(--muted);margin:8px 0 0}
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.game{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;min-width:0}
+.game .teams{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-display);font-size:18px}
+.game .line{color:var(--muted);font-family:var(--font-mono);font-size:12px;margin:4px 0 8px}
+.game .pick{font-weight:600}
+.game .wx{font-size:12px;color:var(--muted)}
+.game .final{font-family:var(--font-mono)}
+.deftable td.l{white-space:normal}
+.legend{font-size:12px;color:var(--muted);padding-block:8px}
+.about{max-width:68ch}
+.about h2{font-family:var(--font-display);font-size:18px;margin:18px 0 6px}
+.about p,.about li{font-size:14px}
+.empty{padding:24px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Improper Board</h1>
+    <span class="meta" id="meta">loading…</span>
+    <nav class="views" aria-label="Views">
+      <button data-view="board" aria-current="true">Board</button>
+      <button data-view="games">Games</button>
+      <button data-view="defenses">Defenses</button>
+      <button data-view="about">How to read</button>
+    </nav>
+  </header>
+
+  <section id="view-board">
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Position" id="posSeg">
+        <button data-pos="QB" aria-pressed="false">QB</button><button data-pos="RB" aria-pressed="true">RB</button><button data-pos="WR" aria-pressed="false">WR</button><button data-pos="TE" aria-pressed="false">TE</button>
+      </div>
+      <input type="search" id="q" placeholder="Player or team" aria-label="Search player or team">
+      <div class="chips" id="flagChips" aria-label="Filters">
+        <button class="chip" data-flag="emerging" aria-pressed="false">emerging</button>
+        <button class="chip" data-flag="soft" aria-pressed="false">soft run D</button>
+        <button class="chip" data-flag="shootout" aria-pressed="false">shootout</button>
+        <button class="chip" data-flag="toughd" aria-pressed="false">tough pass D</button>
+        <button class="chip" data-flag="wind" aria-pressed="false">wind</button>
+        <button class="chip" data-flag="newqb" aria-pressed="false">new QB</button>
+      </div>
+    </div>
+    <div class="layout" id="layout">
+      <div class="tablewrap">
+        <table id="boardTable">
+          <thead><tr>
+            <th data-k="rank">#</th><th class="l" data-k="tier">Tier</th><th class="l" data-k="player">Player</th><th class="l" data-k="team">Tm</th><th class="l" data-k="opp">Opp</th>
+            <th data-k="p10">Floor</th><th data-k="p50" aria-sort="descending">Proj</th><th data-k="p90">Ceiling</th><th class="l">Range</th><th data-k="mean">Mean</th>
+            <th data-k="fp_season">Season</th><th data-k="fp_l3">Last 3</th><th class="l" data-k="utilization">Usage</th><th data-k="def_adj">Opp adj</th><th class="l">Flags</th>
+          </tr></thead>
+          <tbody id="boardBody"></tbody>
+        </table>
+      </div>
+      <aside class="drawer" id="drawer" hidden></aside>
+    </div>
+    <p class="legend">Proj is the median (most likely score). Floor and ceiling are the 10th and 90th percentiles (about 80% of outcomes fall between). Mean is for adding players up and for comparing with ESPN. Click a row for the breakdown.</p>
+  </section>
+
+  <section id="view-games" hidden>
+    <div class="games" id="games"></div>
+    <p class="legend">Pick probability blends the Vegas line with each team's season and last-four-week EPA margins, with a starting-QB and key-absence check. Wind is the kickoff forecast for outdoor stadiums.</p>
+  </section>
+
+  <section id="view-defenses" hidden>
+    <div class="tablewrap"><table id="defTable" class="deftable"><thead><tr>
+      <th class="l" data-k="defteam">Defense</th><th data-k="def_qb_delta">Effect on QBs</th><th data-k="def_qb_delta_raw">Raw</th><th data-k="def_delta_n">Dropbacks</th><th data-k="def_blitz">Blitz %</th><th data-k="def_pressure">Pressure %</th><th class="l" data-k="def_tier">Pass-D tier</th><th data-k="def_expl_sus">Explosive-run rate allowed</th>
+    </tr></thead><tbody id="defBody"></tbody></table></div>
+    <p class="legend">Effect on QBs: EPA per dropback that opposing quarterbacks lost (negative) or gained against this defense relative to their own averages in other games, shrunk toward zero with a 200-dropback prior. The model applies 10 points per unit to the quarterback and every pass catcher facing it. Pass-D tier is on an absolute 2000–2025 scale. Explosive-run rate feeds running-back ceilings only.</p>
+  </section>
+
+  <section id="view-about" hidden>
+    <div class="about">
+      <h2>What the numbers are</h2>
+      <p>Every player gets a distribution, not a point. <strong>Proj</strong> is the median: the score that half of outcomes beat and half fall short of. <strong>Floor</strong> and <strong>Ceiling</strong> are the 10th and 90th percentiles. The <strong>Mean</strong> is the expected value, which is what you add up for a lineup and what ESPN's number is comparable to. The model is validated each week against what happened and against a season-average baseline; the week's results are in the repository's FINDINGS.md.</p>
+      <h2>Where a projection comes from</h2>
+      <ul>
+        <li><strong>Usage</strong>: trailing three games of touches, targets, shares and red-zone work, weighted by snap share; lead-back or lead-receiver status; a teammate who is out this week.</li>
+        <li><strong>The player</strong>: draft pick, experience and prior-season efficiency. This is what separates a back thrust into volume from one who has earned it.</li>
+        <li><strong>The game</strong>: Vegas spread and total, pace, pass rate.</li>
+        <li><strong>The opponent</strong>: each defense's measured effect on quarterbacks, applied equally to the quarterback and every pass catcher facing it (<em>Opp adj</em>), plus wind. Explosive-run susceptibility moves running-back ceilings only.</li>
+      </ul>
+      <h2>Tiers and usage labels</h2>
+      <p>Tiers are rank buckets of the mean (RB1 = top 12, RB2 = 13–24) with sub-tiers (a, b, c) wherever there is a gap of 1.5+ points. The <strong>Usage</strong> label is independent of the projection: elite / high / mid / low from snap share and carry or target share. Where usage is ahead of the projection the model is skeptical of the output; where the projection is ahead of usage, the model is betting on the player's pedigree or a role change.</p>
+      <h2>Flags</h2>
+      <ul>
+        <li><strong>emerging</strong>: trailing average at least 4 points above the season average.</li>
+        <li><strong>soft run D</strong>: opponent is in the bottom third at preventing explosive runs; lifts the back's ceiling.</li>
+        <li><strong>shootout</strong>: both offenses top-third, spread within 3.5, no top-7 pass defense.</li>
+        <li><strong>tough pass D</strong>: opponent's effect on quarterbacks is in the toughest 15%.</li>
+        <li><strong>wind</strong>: 12+ mph forecast; <strong>extreme</strong>: heavy rain or 25+ mph, the passing game may not exist.</li>
+        <li><strong>new QB</strong>: a quarterback change this week, which costs pass catchers about 2.5 points on average regardless of who the new starter is.</li>
+      </ul>
+      <p>Data is free (nflverse). The board is rebuilt every evening after the injury reports post.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+  let BOARD=[],GAMES=[],DEFS=[],META={};
+  let pos='RB', q='', flags=new Set(), sortK='p50', sortDir='desc', selected=null;
+  const fmt=(v,d=1)=>v==null||isNaN(v)?'—':Number(v).toFixed(d);
+  const pct=v=>v==null||isNaN(v)?'—':Math.round(v*100)+'%';
+  const sgn=v=>v==null||isNaN(v)?'—':(v>0?'+':'')+Number(v).toFixed(1);
+  const toughCut=()=>{const vals=DEFS.map(d=>d.def_qb_delta).filter(v=>v!=null).sort((a,b)=>a-b); return vals.length?vals[Math.floor(vals.length*0.15)]:-1;};
+
+  function rowFlags(r){
+    const f=[]; const tc=toughCut();
+    if(r.emerging) f.push(['emerging','good']);
+    if(r.ceiling_flag) f.push(['soft run D','good']);
+    if(r.shootout) f.push(['shootout','good']);
+    if(r.def_qb_delta!=null && r.def_qb_delta<=tc) f.push(['tough pass D','bad']);
+    if(r.extreme) f.push(['extreme weather','bad']); else if(r.wind>=12) f.push([`wind ${Math.round(r.wind)}`,'warn']);
+    if(r.new_starter||r.qb_changed) f.push(['new QB','warn']);
+    if(r.lead_back_out||r.lead_receiver_out) f.push(['teammate out','good']);
+    if(r.status && r.status!=='none' && r.status!=='Out') f.push([r.status,'warn']);
+    return f;
+  }
+  function hasFlag(r,k){const tc=toughCut();return ({emerging:!!r.emerging,soft:!!r.ceiling_flag,shootout:!!r.shootout,toughd:r.def_qb_delta!=null&&r.def_qb_delta<=tc,wind:(r.wind>=12)||!!r.extreme,newqb:!!(r.new_starter||r.qb_changed)})[k];}
+
+  function renderBoard(){
+    let rows=BOARD.filter(r=>r.position===pos);
+    if(q){const s=q.toLowerCase();rows=rows.filter(r=>r.player.toLowerCase().includes(s)||r.team.toLowerCase()===s||r.opp.toLowerCase()===s);}
+    flags.forEach(k=>{rows=rows.filter(r=>hasFlag(r,k));});
+    rows.sort((a,b)=>{const x=a[sortK],y=b[sortK];if(x==null)return 1;if(y==null)return -1;if(typeof x==='string')return sortDir==='asc'?x.localeCompare(y):y.localeCompare(x);return sortDir==='asc'?x-y:y-x;});
+    const lo=Math.min(...rows.map(r=>r.p10??0),0), hi=Math.max(...rows.map(r=>r.p90??0),1);
+    const sc=v=>((v-lo)/(hi-lo)*100).toFixed(1);
+    const tb=$('#boardBody');
+    if(!rows.length){tb.innerHTML='<tr><td colspan="15" class="empty">No players match.</td></tr>';return;}
+    tb.innerHTML=rows.map(r=>`<tr data-id="${r.position}|${r.player}" aria-selected="${selected===r.position+'|'+r.player}">
+      <td class="num">${r.rank}</td><td class="l tier">${r.tier||''}</td><td class="l"><strong>${r.player}</strong></td><td class="l">${r.team}</td><td class="l">${r.opp}</td>
+      <td class="num">${fmt(r.p10)}</td><td class="num proj">${fmt(r.p50)}</td><td class="num">${fmt(r.p90)}</td>
+      <td class="l"><span class="range" aria-hidden="true"><i style="left:${sc(r.p10)}%;width:${(sc(r.p90)-sc(r.p10)).toFixed(1)}%"></i><b style="left:${sc(r.p50)}%"></b></span></td>
+      <td class="num">${fmt(r.mean)}</td><td class="num">${fmt(r.fp_season)}</td><td class="num">${fmt(r.fp_l3)}</td>
+      <td class="l">${r.utilization?`<span class="util ${r.utilization}">${r.utilization}</span>`:''}</td>
+      <td class="num" style="color:${(r.def_adj||0)<-0.5?'var(--bad)':(r.def_adj||0)>0.5?'var(--good)':'inherit'}">${sgn(r.def_adj)}</td>
+      <td class="l">${rowFlags(r).map(([t,c])=>`<span class="flag ${c}">${t}</span>`).join('')}</td></tr>`).join('');
+  }
+
+  function bar(label,v,max,fmtv){const w=Math.min(Math.abs(v||0)/max*100,100);return `<div class="bar"><span>${label}</span><span class="track"><i class="${(v||0)<0?'neg':''}" style="left:${(v||0)<0?50-w/2:50}%;width:${w/2}%"></i></span><span class="v">${fmtv}</span></div>`;}
+  function renderDrawer(){
+    const d=$('#drawer'); const r=BOARD.find(x=>x.position+'|'+x.player===selected);
+    if(!r){d.hidden=true;$('#layout').classList.remove('has-drawer');return;}
+    d.hidden=false;$('#layout').classList.add('has-drawer');
+    const def=DEFS.find(x=>x.defteam===r.opp)||{};
+    const g=GAMES.find(x=>x.home===r.team||x.away===r.team)||{};
+    const pick= r.pick==null?'—':(r.pick>=300?'UDFA':'#'+Math.round(r.pick));
+    const shares= r.position==='RB'?[['Snap share',r.snap_l3],['Carry share',r.carry_share_l3],['Target share',r.target_share_l3],['Red-zone share',r.rz_share],['Goal-line share',r.gl_share]]:[['Snap share',r.snap_l3],['Target share',r.target_share_l3],['Air-yards share',r.air_share_l3],['Red-zone share',r.rz_share]];
+    d.innerHTML=`<button class="close" id="closeDrawer" aria-label="Close">×</button>
+      <h2>${r.player}</h2><div class="sub">${r.position} · ${r.team} vs ${r.opp} · ${r.tier||''}${r.utilization?' · usage '+r.utilization:''}</div>
+      <dl class="kv"><dt>Projection (median)</dt><dd><strong>${fmt(r.p50)}</strong></dd><dt>Floor / ceiling</dt><dd>${fmt(r.p10)} – ${fmt(r.p90)}</dd><dt>Mean</dt><dd>${fmt(r.mean)}</dd><dt>Season avg / last 3</dt><dd>${fmt(r.fp_season)} / ${fmt(r.fp_l3)}</dd><dt>Status</dt><dd>${r.status&&r.status!=='none'?r.status:'no designation'}${r.practice&&r.practice!=='none'?' · '+r.practice.replace(' Participation in Practice','').replace('Did Not Participate In Practice','DNP'):''}</dd></dl>
+      <h3>Why: contributions vs an average ${r.position}</h3>
+      <div class="bars">${bar('Usage',r.contrib_usage,10,sgn(r.contrib_usage))}${bar('Game',r.contrib_environment,10,sgn(r.contrib_environment))}${bar('Pedigree',r.contrib_pedigree,10,sgn(r.contrib_pedigree))}${bar('Opponent',r.def_adj-(r.wind_adj||0),5,sgn(r.def_adj-(r.wind_adj||0)))}${bar('Wind',r.wind_adj,5,sgn(r.wind_adj))}</div>
+      <h3>Usage, last 3 games</h3>
+      <div class="bars">${shares.map(([l,v])=>`<div class="bar"><span>${l}</span><span class="track"><i style="left:0;width:${Math.min((v||0)*100,100)}%"></i></span><span class="v">${pct(v)}</span></div>`).join('')}</div>
+      <dl class="kv" style="margin-top:8px"><dt>${r.position==='QB'?'Rush att / g':'Touches / g'}</dt><dd>${fmt(r.touches_l3)}</dd>${r.position!=='QB'?`<dt>Targets / g</dt><dd>${fmt(r.targets_l3)}</dd>`:''}${r.adot_l3!=null?`<dt>aDOT</dt><dd>${fmt(r.adot_l3)}</dd>`:''}${(r.lead_back_out||r.lead_receiver_out)?`<dt>Teammate out</dt><dd>yes</dd>`:''}${(r.new_starter||r.qb_changed)?`<dt>New QB this week</dt><dd>yes</dd>`:''}</dl>
+      <h3>The player</h3>
+      <dl class="kv"><dt>Draft pick</dt><dd>${pick}</dd><dt>Year</dt><dd>${r.exp==null?'—':Math.round(r.exp)+1}</dd><dt>Prior-season pts / opportunity</dt><dd>${fmt(r.prior_fp_per_opp,2)}</dd><dt>Prior-season opp / g</dt><dd>${fmt(r.prior_opp_pg)}</dd></dl>
+      <h3>The game</h3>
+      <dl class="kv"><dt>Spread (team)</dt><dd>${sgn(r.spread)}</dd><dt>Implied total</dt><dd>${fmt(r.implied_total)}</dd><dt>Wind</dt><dd>${r.wind?Math.round(r.wind)+' mph':'calm / indoors'}</dd>${r.extreme?'<dt>Weather</dt><dd>extreme</dd>':''}${r.shootout?'<dt>Shootout recipe</dt><dd>yes</dd>':''}</dl>
+      <h3>The opponent: ${r.opp}</h3>
+      <dl class="kv"><dt>Effect on QBs</dt><dd>${def.def_qb_delta==null?'—':sgn(def.def_qb_delta*100)+' /100 db'}</dd><dt>Blitz rate</dt><dd>${pct(def.def_blitz)}</dd><dt>Pressure rate</dt><dd>${pct(def.def_pressure)}</dd><dt>Pass-D tier</dt><dd>${def.def_tier||r.def_tier||'—'}</dd>${r.position==='RB'?`<dt>Explosive runs allowed</dt><dd>${pct(def.def_expl_sus)} (${def.def_expl_tercile||'—'})</dd>`:''}</dl>
+      <p class="note">${r.weather_flag?r.weather_flag+'. ':''}Opponent adjustment of ${sgn(r.def_adj)} is applied to the mean and to the whole range; it is the same for every pass catcher on ${r.team}.</p>`;
+    $('#closeDrawer').onclick=()=>{selected=null;renderDrawer();renderBoard();};
+  }
+
+  function renderGames(){
+    const el=$('#games');
+    if(!GAMES.length){el.innerHTML='<p class="empty">No games loaded.</p>';return;}
+    el.innerHTML=GAMES.map(g=>{
+      const final=g.home_score!=null;
+      const fav=g.spread>0?g.home:g.away; const sp=g.spread==null?'':`${fav} −${Math.abs(g.spread)}`;
+      const wx= g.roof==='dome'||g.roof==='closed'?'indoors':(g.wind==null?'forecast pending':`${Math.round(g.wind)} mph wind${g.precip?`, ${Math.round(g.precip)}% precip`:''}`)+(g.extreme?' · EXTREME':'');
+      const pickTxt= final?`<span class="final">Final ${g.away} ${g.away_score} – ${g.home} ${g.home_score}${g.pick?` · pick ${g.pick} ${g.pick===(g.home_score>g.away_score?g.home:g.away)?'✓':'✗'}`:''}</span>`:(g.pick?`<span class="pick">${g.pick}</span> <span class="num">${Math.round((g.prob||0)*100)}%</span>`:'no pick');
+      return `<div class="game"><div class="teams"><span>${g.away}</span><span style="color:var(--muted);font-size:13px">at</span><span>${g.home}</span></div>
+        <div class="line">${g.gameday} ${g.gametime} · ${sp}${g.total?` · O/U ${g.total}`:''}</div>
+        <div>${pickTxt}</div>${g.note?`<div class="wx">${g.note}</div>`:''}
+        <div class="wx">${g.stadium} · ${wx}</div></div>`;}).join('');
+  }
+  let defSortK='def_qb_delta',defDir='asc';
+  function renderDefs(){
+    const rows=[...DEFS].sort((a,b)=>{const x=a[defSortK],y=b[defSortK];if(x==null)return 1;if(y==null)return -1;if(typeof x==='string')return defDir==='asc'?x.localeCompare(y):y.localeCompare(x);return defDir==='asc'?x-y:y-x;});
+    $('#defBody').innerHTML=rows.map(d=>`<tr><td class="l"><strong>${d.defteam}</strong></td><td class="num" style="color:${d.def_qb_delta<-0.05?'var(--good)':d.def_qb_delta>0.05?'var(--bad)':'inherit'}">${d.def_qb_delta==null?'—':(d.def_qb_delta*100).toFixed(1)}</td><td class="num">${d.def_qb_delta_raw==null?'—':(d.def_qb_delta_raw*100).toFixed(1)}</td><td class="num">${d.def_delta_n??'—'}</td><td class="num">${pct(d.def_blitz)}</td><td class="num">${pct(d.def_pressure)}</td><td class="l">${d.def_tier||'—'}</td><td class="num">${pct(d.def_expl_sus)}${d.def_expl_tercile?` <span class="status">${d.def_expl_tercile}</span>`:''}</td></tr>`).join('');
+    $$('#defTable th').forEach(th=>{th.removeAttribute('aria-sort');if(th.dataset.k===defSortK)th.setAttribute('aria-sort',defDir==='asc'?'ascending':'descending');});
+  }
+
+  // events
+  $$('#posSeg button').forEach(b=>b.onclick=()=>{pos=b.dataset.pos;$$('#posSeg button').forEach(x=>x.setAttribute('aria-pressed',x===b));selected=null;renderDrawer();renderBoard();try{localStorage.setItem('ib.pos',pos)}catch(e){}});
+  $('#q').oninput=e=>{q=e.target.value.trim();renderBoard();};
+  $$('#flagChips .chip').forEach(c=>c.onclick=()=>{const k=c.dataset.flag;flags.has(k)?flags.delete(k):flags.add(k);c.setAttribute('aria-pressed',flags.has(k));renderBoard();});
+  $$('#boardTable th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(sortK===k)sortDir=sortDir==='asc'?'desc':'asc';else{sortK=k;sortDir=(k==='rank'||k==='player'||k==='team'||k==='opp'||k==='tier'||k==='utilization')?'asc':'desc';}$$('#boardTable th').forEach(x=>x.removeAttribute('aria-sort'));th.setAttribute('aria-sort',sortDir==='asc'?'ascending':'descending');renderBoard();});
+  $$('#defTable th[data-k]').forEach(th=>th.onclick=()=>{const k=th.dataset.k;if(defSortK===k)defDir=defDir==='asc'?'desc':'asc';else{defSortK=k;defDir=k==='defteam'||k==='def_tier'?'asc':'desc';}renderDefs();});
+  $('#boardBody').addEventListener('click',e=>{const tr=e.target.closest('tr[data-id]');if(!tr)return;selected=selected===tr.dataset.id?null:tr.dataset.id;renderDrawer();renderBoard();});
+  $$('nav.views button').forEach(b=>b.onclick=()=>showView(b.dataset.view));
+  function showView(v){$$('nav.views button').forEach(x=>x.setAttribute('aria-current',x.dataset.view===v));['board','games','defenses','about'].forEach(k=>{$('#view-'+k).hidden=k!==v;});if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);}
+  window.addEventListener('hashchange',()=>{const v=location.hash.replace('#','');if(['board','games','defenses','about'].includes(v))showView(v);});
+
+  async function load(){
+    try{
+      const [b,g,d,m]=await Promise.all(['data/board.json','data/games.json','data/defenses.json','data/meta.json'].map(u=>fetch(u).then(r=>r.json())));
+      BOARD=b;GAMES=g;DEFS=d;META=m;
+      $('#meta').textContent=`${META.season} · week ${META.week} · built ${META.built}`;
+    }catch(e){$('#meta').textContent='data failed to load';$('#boardBody').innerHTML='<tr><td colspan="15" class="empty">Could not load the board data.</td></tr>';return;}
+    try{const p=localStorage.getItem('ib.pos');if(p&&['QB','RB','WR','TE'].includes(p)){pos=p;$$('#posSeg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.pos===p));}}catch(e){}
+    renderBoard();renderGames();renderDefs();
+    const v=location.hash.replace('#','');if(['board','games','defenses','about'].includes(v))showView(v);
+  }
+  load();
+})();
+</script>

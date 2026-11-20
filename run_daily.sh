@@ -18,3 +18,4 @@ for y in 2025 $S; do python src/expl_traits.py $y; python src/qb_traits.py $y; p
 python src/features.py $S $W
 python src/project.py 2025 $S $W
 python src/board.py $S $W
+python src/export_ui.py $S $W

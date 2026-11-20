@@ -35,6 +35,17 @@ Doubtful is treated as Out automatically. The extreme-weather flag (heavy rain
 or 25+ mph sustained) is manual: QB −4, WR/TE −35% of the mean, RBs noted
 "run-heavy script"; the size is an assumption pending precipitation history.
 
+## Web UI
+
+`ui/index.html` plus `ui/data/*.json` (from `python src/export_ui.py 2026 <week>`,
+run at the end of `run_daily.sh`). Published as a Claude artifact at
+https://claude.ai/artifact/XoKeaVNCVYXWE7z97oHzbk (private until shared). To
+refresh it after a run, republish the four data files to that URL; the page
+itself only changes when the UI changes. Views: Board (position, search,
+flag filters, sortable, row drawer with the contribution breakdown, usage,
+pedigree, game and opponent), Games (picks, lines, weather), Defenses (each
+defense's effect on QBs, blitz/pressure, tier, explosive-run rate), How to read.
+
 ## Inputs (all free, nflverse)
 
 Per player, using only games before the target week:
