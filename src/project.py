@@ -241,6 +241,18 @@ for pos, grp in GROUPS.items():
         te["wind_adj"] = -0.095 * wind
     else:
         te["wind_adj"] = -0.23 * wind * te.get("target_share_l3", pd.Series(0.0, index=te.index)).fillna(0)
+    # extreme weather (manual flag: heavy rain or 25+ mph sustained at kickoff): the passing game may not exist.
+    # Size is an assumption, not an estimate (no precipitation in free historical data); every instance is logged.
+    ext = te.get("extreme", pd.Series(0, index=te.index)).fillna(0).astype(int)
+    if pos == "QB":
+        te["weather_flag"] = np.where(ext == 1, "extreme: passing at risk", "")
+        te["wind_adj"] = te.wind_adj - 4.0 * ext
+    elif pos in ("WR", "TE"):
+        te["weather_flag"] = np.where(ext == 1, "extreme: passing at risk", "")
+        base_mean = pd.Series(te.fp_season if use_season else med.predict(Xb_s), index=te.index).clip(lower=0)
+        te["wind_adj"] = te.wind_adj - 0.35 * ext * base_mean
+    else:
+        te["weather_flag"] = np.where(ext == 1, "extreme: run-heavy script", "")
     te["def_adj"] = DEF_C[pos] * te.def_qb_delta + te.wind_adj
     te["mean"] = ((te.mean_pass + te.mean_rush) if pos == "QB" else (te.fp_season if use_season else med.predict(Xb_s))) + te.def_adj
     if pos == "QB":
@@ -285,7 +297,7 @@ for pos, n, sc, best in report:
     print(f"  {pos} (n={n}): " + " | ".join(f"{k}: {v['MAE']} / {v['rank']}" for k, v in sc.items()) + f"   -> using '{best}'")
 pd.set_option("display.width", 250)
 P["ceiling_flag"] = np.where((P.position == "RB") & (P.def_expl_tercile == "soft"), "soft run D", "")
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "weather_flag", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
     sel = P[P.player.isin(NAMES)]
 else:

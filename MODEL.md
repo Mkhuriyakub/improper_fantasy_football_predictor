@@ -24,6 +24,17 @@ validation each time it runs, so a change that hurts accuracy is visible.
 (week, player, status=Out; or week, team, new_qb=1) and is applied by
 `features.py` every run, including the teammate-out flags.
 
+## Daily cadence
+
+`./run_daily.sh 2026 <week>` refreshes data, rebuilds traits/features/projections/board.
+A scheduled task runs it every evening (6 pm Pacific, after the injury report
+posts) and commits; the run also updates `data/weather_{season}_wk{W}.csv`
+(wind, precip chance, extreme flag per outdoor stadium from the forecast page)
+and `data/overrides_{season}.csv` for news the injury feed doesn't carry.
+Doubtful is treated as Out automatically. The extreme-weather flag (heavy rain
+or 25+ mph sustained) is manual: QB −4, WR/TE −35% of the mean, RBs noted
+"run-heavy script"; the size is an assumption pending precipitation history.
+
 ## Inputs (all free, nflverse)
 
 Per player, using only games before the target week:
