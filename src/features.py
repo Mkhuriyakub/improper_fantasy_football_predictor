@@ -138,9 +138,16 @@ pl_state = ev.groupby(["ev_id", "posteam", "week"]).agg(
 team_tg = targets.groupby(["posteam", "week"]).agg(team_targets=("play_id", "size"), team_air=("air_yards", "sum")).reset_index()
 
 # vegas
-h = sched[["week", "home_team", "away_team", "spread_line", "total_line", "roof"]].rename(columns={"home_team": "team", "away_team": "opp"})
+_wx = ROOT / "data" / f"weather_{SEASON}_wk{TARGET_WEEK}.csv" if "TARGET_WEEK" in globals() and TARGET_WEEK else None
+if _wx is not None and _wx.exists():  # forecast for the target week overrides
+    _w = pd.read_csv(_wx).dropna(subset=["wind"])
+    sched = sched.merge(_w[["home_team", "wind"]].rename(columns={"wind": "wind_fc"}), on="home_team", how="left")
+    sched.loc[sched.week == TARGET_WEEK, "wind"] = sched.loc[sched.week == TARGET_WEEK, "wind_fc"]
+    sched = sched.drop(columns=["wind_fc"])
+sched["wind"] = sched.wind.where(sched.roof.isin(["outdoors", "open"]), 0).fillna(0)
+h = sched[["week", "home_team", "away_team", "spread_line", "total_line", "roof", "wind"]].rename(columns={"home_team": "team", "away_team": "opp"})
 h["spread"] = -h.spread_line
-a = sched[["week", "home_team", "away_team", "spread_line", "total_line", "roof"]].rename(columns={"away_team": "team", "home_team": "opp"})
+a = sched[["week", "home_team", "away_team", "spread_line", "total_line", "roof", "wind"]].rename(columns={"away_team": "team", "home_team": "opp"})
 a["spread"] = a.spread_line
 vegas = pd.concat([h, a])
 vegas["implied_total"] = vegas.total_line / 2 - vegas.spread / 2
@@ -207,7 +214,7 @@ for w in weeks:
             is_lead_back=int(lead_rb == pid), lead_back_out=int(len(ls) and ls.report_status.iat[0] == "Out" and lead_rb != pid),
             is_lead_receiver=int(lead_wr == pid), lead_receiver_out=int(len(lws) and lws.report_status.iat[0] == "Out" and lead_wr != pid),
             spread=g.spread.iat[0], total_line=g.total_line.iat[0], implied_total=g.implied_total.iat[0],
-            dome=int(str(g.roof.iat[0]) in ("dome", "closed")),
+            dome=int(str(g.roof.iat[0]) in ("dome", "closed")), wind=float(g.wind.iat[0]) if "wind" in g else 0.0,
             **{k: prof_o.get(k, np.nan) for k in prof.columns if k.startswith("off_")},
             **{"opp_" + k: prof_d.get(k, np.nan) for k in prof.columns if k.startswith("def_")},
             **{k: prof_d.get(k, np.nan) for k in prof.columns if k.startswith("opp_off_")},

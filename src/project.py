@@ -234,7 +234,14 @@ for pos, grp in GROUPS.items():
     q50 = QuantileRegressor(quantile=0.50, alpha=0.01, solver="highs").fit(Xa_s, tr.fp)
     q90 = QuantileRegressor(quantile=0.90, alpha=0.01, solver="highs").fit(Xa_qs, tr.fp)
     # structural defense adjustment: the opponent's measured effect on quarterbacks, applied to the whole passing game
-    te["def_adj"] = DEF_C[pos] * te.def_qb_delta
+    # plus wind (2019-25 outdoor games, net of the Vegas total: -0.095 QB passing pts per mph; pass catchers share
+    # ~2.4x that in PPR, split by target share). Cold has no effect beyond the total and is not used.
+    wind = te.get("wind", pd.Series(0.0, index=te.index)).fillna(0)
+    if pos == "QB":
+        te["wind_adj"] = -0.095 * wind
+    else:
+        te["wind_adj"] = -0.23 * wind * te.get("target_share_l3", pd.Series(0.0, index=te.index)).fillna(0)
+    te["def_adj"] = DEF_C[pos] * te.def_qb_delta + te.wind_adj
     te["mean"] = ((te.mean_pass + te.mean_rush) if pos == "QB" else (te.fp_season if use_season else med.predict(Xb_s))) + te.def_adj
     if pos == "QB":
         te["mean_pass"] = te.mean_pass + te.def_adj
@@ -278,7 +285,7 @@ for pos, n, sc, best in report:
     print(f"  {pos} (n={n}): " + " | ".join(f"{k}: {v['MAE']} / {v['rank']}" for k, v in sc.items()) + f"   -> using '{best}'")
 pd.set_option("display.width", 250)
 P["ceiling_flag"] = np.where((P.position == "RB") & (P.def_expl_tercile == "soft"), "soft run D", "")
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
     sel = P[P.player.isin(NAMES)]
 else:
