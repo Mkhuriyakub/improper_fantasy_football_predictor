@@ -238,10 +238,11 @@ feat = pd.DataFrame(rows)
 # manual overrides for news the injury file doesn't carry yet: data/overrides_{season}.csv
 # columns: week, player, status (Out) | week, team, new_qb (1) -> flags pass catchers as new-starter weeks
 _ov = ROOT / "data" / f"overrides_{SEASON}.csv"
+feat["qb_override"] = 0
 if _ov.exists():
     ov = pd.read_csv(_ov)
     for r in ov[ov.get("status", pd.Series(dtype=str)).notna()].itertuples():
-        m = (feat.week == r.week) & (feat.player == r.player)
+        m = ((feat.week == r.week) | (r.week == 0)) & (feat.player == r.player)  # week 0 = rest of season
         feat.loc[m, "status"] = r.status
         if r.status == "Out" and m.any():
             team, pos = feat.loc[m, "team"].iat[0], feat.loc[m, "position"].iat[0]
@@ -253,9 +254,7 @@ if _ov.exists():
     if "new_qb" in ov:
         for r in ov[ov.new_qb == 1].itertuples():
             tm = (feat.week == r.week) & (feat.team == r.team) & (feat.position != "QB")
-            for c in ("new_starter", "qb_changed"):
-                if c in feat:
-                    feat.loc[tm, c] = 1
+            feat.loc[tm, "qb_override"] = 1  # project.py folds this into new_starter
     print(f"overrides applied: {len(ov)} rows")
 feat["p_trail_proxy"] = 1 / (1 + np.exp(-feat.spread / 6))
 feat["script_risk"] = feat.p_trail_proxy * feat.script_sens

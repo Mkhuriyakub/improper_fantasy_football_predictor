@@ -21,7 +21,7 @@ produce the training table. `project.py` prints the 2025 walk-forward
 validation each time it runs, so a change that hurts accuracy is visible.
 
 `data/overrides_{season}.csv` carries news the injury file doesn't have yet
-(week, player, status=Out; or week, team, new_qb=1) and is applied by
+(week, player, status=Out; week 0 = rest of season; or week, team, new_qb=1) and is applied by
 `features.py` every run, including the teammate-out flags.
 
 ## Daily cadence
@@ -34,6 +34,26 @@ and `data/overrides_{season}.csv` for news the injury feed doesn't carry.
 Doubtful is treated as Out automatically. The extreme-weather flag (heavy rain
 or 25+ mph sustained) is manual: QB −4, WR/TE −35% of the mean, RBs noted
 "run-heavy script"; the size is an assumption pending precipitation history.
+
+## Validation suite
+
+`./run_checks.sh` (pytest, `tests/`) runs against the latest built week at the
+end of every daily run and fails the run on any error. It checks the output
+contract (every column the board and UI depend on; p10 ≤ p50 ≤ p90; finite
+numbers; no Out or bye players on the board; ranks, tiers and sort order),
+flag definitions (soft run D matches the defense table; emerging excludes
+established top-12 players; extreme weather applied), the adjustment identity
+(def_adj = 10 × def_qb_delta + wind_adj, equal within an offense, never
+positive for wind, zero in domes), input hygiene (every override name resolves
+to a real player; Out and new-QB overrides land in features and projections;
+Doubtful treated as Out; lead-back-out flags; wind matches the forecast file;
+rest-of-season Outs never appear), walk-forward hygiene (fp_season matches
+prior-week stats; no target-week score inside fp_l3; defense effect at week 1
+has no current-season dropbacks) and the UI export (same players as the board,
+required keys, one game per scheduled game, 32 defenses). The first run of the
+suite found three live bugs: the soft-run-D flag written after the save, the
+new-QB override never reaching the model, and a misspelled override name that
+silently did nothing.
 
 ## Web UI
 

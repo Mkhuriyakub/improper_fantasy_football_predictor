@@ -19,3 +19,4 @@ python src/features.py $S $W
 python src/project.py 2025 $S $W
 python src/board.py $S $W
 python src/export_ui.py $S $W
+./run_checks.sh

@@ -18,7 +18,8 @@ proj = pd.read_parquet(ROOT / "results" / f"projections_{SEASON}_wk{WEEK}.parque
 feat = pd.read_parquet(ROOT / "results" / f"features_{SEASON}_wk{WEEK}.parquet")
 ped = pd.read_parquet(ROOT / "results" / f"pedigree_{SEASON}.parquet")
 fcols = [c for c in ["player_id", "wind", "precip", "extreme", "games_prior", "touches_l3", "carries_l3", "targets_l3", "adot_l3", "air_share_l3", "gl_share", "lead_back_out", "lead_receiver_out", "new_starter", "qb_changed"] if c in feat]
-extra = proj.drop(columns=[c for c in proj.columns if c in feat.columns and c not in ("player_id",)], errors="ignore").merge(feat[fcols], on="player_id", how="left").merge(ped, on="player_id", how="left")
+extra = proj.drop(columns=[c for c in proj.columns if c in feat.columns and c not in ("player_id",)], errors="ignore").merge(feat[fcols], on="player_id", how="left")
+extra = extra.merge(ped[[c for c in ped.columns if c == "player_id" or c not in extra.columns]], on="player_id", how="left")
 for c in ("player", "position", "team", "opp", "spread", "implied_total", "status", "practice"):
     if c not in extra and c in proj:
         extra[c] = proj.set_index("player_id").loc[extra.player_id, c].values

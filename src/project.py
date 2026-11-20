@@ -40,6 +40,8 @@ def add_qb(df, season):
     q = pd.read_parquet(ROOT / "results" / f"qb_traits_{season}.parquet")
     df = df.merge(q[["team", "week", "qb_id", "qb_name", "qb_epa", "qb_expl", "qb_changed"]], on=["team", "week"], how="left")
     df["new_starter"] = df.qb_changed.fillna(0).astype(int)  # starter differs from 3 weeks earlier (what the trailing window reflects)
+    if "qb_override" in df:  # manual: a new starter named this week (data/overrides_{season}.csv)
+        df["new_starter"] = np.maximum(df.new_starter, df.qb_override.fillna(0).astype(int))
     return df
 
 
