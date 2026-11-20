@@ -137,27 +137,31 @@ td.proj{font-weight:600}
 
   <section id="view-about" hidden>
     <div class="about">
-      <h2>What the numbers are</h2>
-      <p>Every player gets a distribution, not a point. <strong>Proj</strong> is the median: the score that half of outcomes beat and half fall short of. <strong>Floor</strong> and <strong>Ceiling</strong> are the 10th and 90th percentiles. The <strong>Mean</strong> is the expected value, which is what you add up for a lineup and what ESPN's number is comparable to. The model is validated each week against what happened and against a season-average baseline; the week's results are in the repository's FINDINGS.md.</p>
-      <h2>Where a projection comes from</h2>
+      <h2>The three numbers</h2>
+      <p>No one can tell you exactly what a player will score, so the board gives you a range instead of a single guess. <strong>Proj</strong> is the most likely score: as many weeks will come in above it as below it. <strong>Floor</strong> is a bad week and <strong>Ceiling</strong> a great one; about 8 weeks in 10 land somewhere between them. The <strong>Mean</strong> is the average of all possible outcomes. It runs a little higher than Proj because big games pull the average up. Use Proj to compare two players for a start/sit decision, and the Mean when you are adding up a whole lineup or comparing with ESPN or Yahoo.</p>
+      <h2>Where the number comes from</h2>
+      <p>Four things, in order of how much they matter:</p>
       <ul>
-        <li><strong>Usage</strong>: trailing three games of touches, targets, shares and red-zone work, weighted by snap share; lead-back or lead-receiver status; a teammate who is out this week.</li>
-        <li><strong>The player</strong>: draft pick, experience and prior-season efficiency. This is what separates a back thrust into volume from one who has earned it.</li>
-        <li><strong>The game</strong>: Vegas spread and total, pace, pass rate.</li>
-        <li><strong>The opponent</strong>: each defense's measured effect on quarterbacks, applied equally to the quarterback and every pass catcher facing it (<em>Opp adj</em>), plus wind. Explosive-run susceptibility moves running-back ceilings only.</li>
+        <li><strong>How much he's been used.</strong> Carries, targets, and his share of the team's work over the last three games, with extra weight on red-zone and goal-line chances. Whether he is the lead back or lead receiver, and whether a teammate who normally takes work is out this week.</li>
+        <li><strong>Who he is.</strong> Where he was drafted, how many years he's been in the league, and how productive he was per touch last season. This is how the model tells the difference between a backup who's filling in and a talented young player who has taken the job.</li>
+        <li><strong>The game.</strong> The point spread and expected total from the betting line, how fast the team plays, and how often it throws.</li>
+        <li><strong>The opponent and the weather.</strong> Every defense is measured by what it has done to the quarterbacks it has faced, compared with how those quarterbacks played against everyone else. A defense that has made good quarterbacks look ordinary costs points for the quarterback <em>and every receiver and back catching passes</em> against it, equally. That's the <strong>Opp adj</strong> column. Wind takes a little more off passing. A defense that gives up long runs raises a running back's ceiling but not his most likely score.</li>
       </ul>
-      <h2>Tiers and usage labels</h2>
-      <p>Tiers are rank buckets of the mean (RB1 = top 12, RB2 = 13–24) with sub-tiers (a, b, c) wherever there is a gap of 1.5+ points. The <strong>Usage</strong> label is independent of the projection: elite / high / mid / low from snap share and carry or target share. Where usage is ahead of the projection the model is skeptical of the output; where the projection is ahead of usage, the model is betting on the player's pedigree or a role change.</p>
+      <p>The model deliberately does <em>not</em> use a lot of things you'll see elsewhere, because we tested them and they didn't predict anything: "points allowed to wide receivers," matchups against particular corners, coaching tendencies, offensive-line rankings. Each week's projections are checked against what actually happened and against the dumbest possible alternative, a player's season average; the running record is kept in the project's findings file.</p>
+      <h2>Tiers and the Usage label</h2>
+      <p><strong>Tier</strong> groups players by rank: RB1 means a top-12 projection, RB2 means 13 to 24, and so on. The letter breaks each group where there's a real gap in the numbers: RB1-a players are clearly ahead of RB1-b players, while two players in the same letter are close enough to call a coin flip.</p>
+      <p><strong>Usage</strong> is a separate label that ignores the projection and only looks at how much the player has been on the field and getting the ball lately: <strong>elite</strong>, <strong>high</strong>, <strong>mid</strong>, or <strong>low</strong>. The useful cases are where the two disagree. A player with elite usage but a modest projection is someone getting a lot of work and not doing much with it; the model doubts the output but the opportunity is real. A player with a strong projection and low usage is someone the model believes in for reasons beyond recent work, usually pedigree or a role that just changed. Those are the rows to think hardest about.</p>
       <h2>Flags</h2>
       <ul>
-        <li><strong>emerging</strong>: trailing average at least 4 points above the season average.</li>
-        <li><strong>soft run D</strong>: opponent is in the bottom third at preventing explosive runs; lifts the back's ceiling.</li>
-        <li><strong>shootout</strong>: both offenses top-third, spread within 3.5, no top-7 pass defense.</li>
-        <li><strong>tough pass D</strong>: opponent's effect on quarterbacks is in the toughest 15%.</li>
-        <li><strong>wind</strong>: 12+ mph forecast; <strong>extreme</strong>: heavy rain or 25+ mph, the passing game may not exist.</li>
-        <li><strong>new QB</strong>: a quarterback change this week, which costs pass catchers about 2.5 points on average regardless of who the new starter is.</li>
+        <li><strong>emerging</strong>: the player has been producing well above his season average over the last three games, and he wasn't already a top-12 player on the year. Something has changed recently: a bigger role, a teammate out, a new quarterback, or a hot streak. Open the row to see which. History says most of these settle about halfway back; the ones that stick are usually high draft picks or players producing efficiently with the extra work, not just getting it.</li>
+        <li><strong>soft run D</strong>: the opponent gives up long runs at a high rate. The back's ceiling is higher this week; his most likely score isn't.</li>
+        <li><strong>shootout</strong>: two good offenses, a close line, and no top defense. Games like this go over the total far more often than usual.</li>
+        <li><strong>tough pass D</strong>: the opponent is among the hardest defenses in the league to throw against, by what it has done to real quarterbacks this season.</li>
+        <li><strong>wind</strong>: 12 mph or more forecast at kickoff. <strong>extreme weather</strong>: heavy rain or very high wind; the passing game may barely happen, and that cuts the quarterback and receivers hard.</li>
+        <li><strong>new QB</strong>: a different quarterback is starting this week. Receivers lose about 2.5 points on average in that first week, no matter who the new starter is.</li>
+        <li><strong>teammate out</strong>: the usual lead back or lead receiver on his team is out, so there is more work to go around.</li>
       </ul>
-      <p>Data is free (nflverse). The board is rebuilt every evening after the injury reports post.</p>
+      <p>All data is free and public. The board is rebuilt every evening after the injury reports come out, and again Saturday with the final designations and weather.</p>
     </div>
   </section>
 </div>

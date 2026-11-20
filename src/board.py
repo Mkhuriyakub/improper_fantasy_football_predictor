@@ -52,7 +52,9 @@ def util(r):
 
 
 p["utilization"] = p.apply(util, axis=1)
-p["emerging"] = ((p.fp_l3 - p.fp_season) >= 4).astype(int)
+# emerging: recent production well above the season average AND not already an established top-12 player on the season
+season_rank = p.groupby("position").fp_season.rank(ascending=False)
+p["emerging"] = (((p.fp_l3 - p.fp_season) >= 4) & (season_rank > 12)).astype(int)
 out = []
 for pos, n in N.items():
     b = tiers(p[p.position == pos].copy(), pos)
