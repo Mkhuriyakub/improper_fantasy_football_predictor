@@ -158,7 +158,10 @@ a = sched[["week", "home_team", "away_team", "spread_line", "total_line", "roof"
 a["spread"] = a.spread_line
 vegas = pd.concat([h, a])
 vegas["implied_total"] = vegas.total_line / 2 - vegas.spread / 2
-inj_w = inj[["week", "team", "gsis_id", "report_status", "practice_status"]].rename(columns={"gsis_id": "player_id"}) if inj is not None else None
+inj_w = inj[["week", "team", "gsis_id", "report_status", "practice_status", "report_primary_injury", "practice_primary_injury"]].rename(columns={"gsis_id": "player_id"}) if inj is not None else None
+if inj_w is not None:
+    inj_w["injury"] = inj_w.report_primary_injury.fillna(inj_w.practice_primary_injury).str.lower().str.strip()
+    inj_w = inj_w.drop(columns=["report_primary_injury", "practice_primary_injury"])
 if inj_w is not None:  # Doubtful is treated as Out for projection purposes (historically ~90% inactive)
     inj_w["report_status"] = inj_w.report_status.replace({"Doubtful": "Out"})
 
@@ -223,6 +226,7 @@ for w in weeks:
             script_sens=(trail_share - neutral_share) if pd.notna(trail_share) and pd.notna(neutral_share) else 0.0,
             status=status.report_status.iat[0] if len(status) and pd.notna(status.report_status.iat[0]) else "none",
             practice=status.practice_status.iat[0] if len(status) and pd.notna(status.practice_status.iat[0]) else "none",
+            injury=status.injury.iat[0] if len(status) and "injury" in status and pd.notna(status.injury.iat[0]) else "",
             is_lead_back=int(lead_rb == pid), lead_back_out=int(len(ls) and ls.report_status.iat[0] == "Out" and lead_rb != pid),
             is_lead_receiver=int(lead_wr == pid), lead_receiver_out=int(len(lws) and lws.report_status.iat[0] == "Out" and lead_wr != pid),
             spread=g.spread.iat[0], total_line=g.total_line.iat[0], implied_total=g.implied_total.iat[0],

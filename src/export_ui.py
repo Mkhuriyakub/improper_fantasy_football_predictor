@@ -23,7 +23,7 @@ extra = extra.merge(ped[[c for c in ped.columns if c == "player_id" or c not in 
 for c in ("player", "position", "team", "opp", "spread", "implied_total", "status", "practice"):
     if c not in extra and c in proj:
         extra[c] = proj.set_index("player_id").loc[extra.player_id, c].values
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "fp_season", "fp_l3", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "weather_flag", "def_blitz", "ceiling_flag", "shootout", "contrib_usage", "contrib_environment", "contrib_matchup", "contrib_pedigree", "spread", "implied_total", "wind", "precip", "extreme", "games_prior", "touches_l3", "carries_l3", "targets_l3", "adot_l3", "air_share_l3", "gl_share", "lead_back_out", "lead_receiver_out", "new_starter", "pick", "exp", "prior_fp_per_opp", "prior_opp_pg", "status", "practice"]
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "fp_season", "fp_l3", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "injury_adj", "injury", "weather_flag", "def_blitz", "ceiling_flag", "shootout", "contrib_usage", "contrib_environment", "contrib_matchup", "contrib_pedigree", "spread", "implied_total", "wind", "precip", "extreme", "games_prior", "touches_l3", "carries_l3", "targets_l3", "adot_l3", "air_share_l3", "gl_share", "lead_back_out", "lead_receiver_out", "new_starter", "pick", "exp", "prior_fp_per_opp", "prior_opp_pg", "status", "practice"]
 extra = extra[[c for c in cols if c in extra]]
 b = board.merge(extra.drop(columns=[c for c in extra if c in board and c not in ("player", "position")]), on=["player", "position"], how="left")
 b = b.replace({np.nan: None})

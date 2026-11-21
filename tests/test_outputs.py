@@ -86,8 +86,14 @@ def test_emerging_excludes_established(board):
 
 
 def test_defense_adjustment_identity(proj):
-    diff = (proj.def_adj - (10 * proj.def_qb_delta + proj.wind_adj)).abs()
-    assert (diff < 1e-6).all(), "def_adj != 10*def_qb_delta + wind_adj"
+    diff = (proj.def_adj - (10 * proj.def_qb_delta + proj.wind_adj + proj.injury_adj)).abs()
+    assert (diff < 1e-6).all(), "def_adj != 10*def_qb_delta + wind_adj + injury_adj"
+
+
+def test_injury_adjustment_only_with_listed_injury(proj):
+    none = proj[proj.injury.fillna("") == ""]
+    assert (none.injury_adj.abs() < 1e-9).all(), "injury adjustment applied without a listed injury"
+    assert (proj.injury_adj <= 1e-9).all() and (proj.injury_adj >= -2.0).all()
 
 
 def test_defense_adjustment_equal_within_team(proj):

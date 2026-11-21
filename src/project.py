@@ -131,6 +131,21 @@ tr_all, te_all = add_cpoe(tr_all, TRAIN), add_cpoe(te_all, SEASON)
 # Validated 2024+2025 on top+emerging: c=10 lowers MAE for WR/TE/RB in 5 of 6 season-position cells and removes most of
 # the -1 to -2.5 under-performance of pass catchers against the toughest 15% of defenses. Ridge learns it at half strength.
 DEF_C = {"WR": 10.0, "TE": 10.0, "RB": 10.0, "QB": 10.0}
+
+# Effect of a listed injury on an active top-N player, points vs projection, 2024-25 (n in comments), shrunk n/(n+30).
+INJURY_ADJ = {"illness": -1.6, "calf": -1.0, "wrist": -1.2, "hamstring": -1.4, "shoulder": -1.2, "concussion": -0.7, "back": -0.7,
+              "toe": -0.6, "knee": -0.4, "groin": -0.1, "ankle": 0.0}
+INJURY_ADJ_POS = {("RB", "ankle"): -0.7, ("RB", "knee"): -0.8, ("QB", "knee"): -0.9, ("QB", "shoulder"): -1.0, ("WR", "hamstring"): -1.4}
+
+
+def injury_adjust(injury, pos):
+    if not isinstance(injury, str) or not injury:
+        return 0.0
+    key = injury.lower()
+    for k in ("illness", "calf", "wrist", "hamstring", "shoulder", "concussion", "back", "toe", "knee", "groin", "ankle"):
+        if k in key:
+            return INJURY_ADJ_POS.get((pos, k), INJURY_ADJ[k])
+    return 0.0
 PEDIGREE = ["top64", "log_pick", "exp", "prior_fp_per_opp", "prior_opp_pg"]
 _QB_PASS_BASE = ["pass_fp_l3", "pass_fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "qb_epa", "cpoe_std"]
 _QB_PASS_TAIL = [
@@ -259,7 +274,10 @@ for pos, grp in GROUPS.items():
         te["wind_adj"] = te.wind_adj - 0.35 * ext * base_mean
     else:
         te["weather_flag"] = np.where(ext == 1, "extreme: run-heavy script", "")
-    te["def_adj"] = DEF_C[pos] * te.def_qb_delta + te.wind_adj
+    # listed injury, for players who are active (2024-25, top-N players who played, bias vs players with nothing listed,
+    # shrunk toward 0 by n/(n+30)); the designation itself carries no effect once he plays. Not learned; applied.
+    te["injury_adj"] = te.apply(lambda r: injury_adjust(r.get("injury", ""), pos), axis=1) if "injury" in te else 0.0
+    te["def_adj"] = DEF_C[pos] * te.def_qb_delta + te.wind_adj + te.injury_adj
     te["mean"] = ((te.mean_pass + te.mean_rush) if pos == "QB" else (te.fp_season if use_season else med.predict(Xb_s))) + te.def_adj
     if pos == "QB":
         te["mean_pass"] = te.mean_pass + te.def_adj
@@ -306,7 +324,7 @@ import json as _json
 _json.dump({pos: dict(n=int(n), chosen=best, **{k: dict(MAE=float(v["MAE"]), rank=float(v["rank"])) for k, v in sc.items()}) for pos, n, sc, best in report},
            open(ROOT / "results" / f"validation_{TRAIN}_latest.json", "w"), indent=1)
 pd.set_option("display.width", 250)
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "weather_flag", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "injury_adj", "injury", "weather_flag", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
     sel = P[P.player.isin(NAMES)]
 else:

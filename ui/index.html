@@ -160,6 +160,7 @@ td.proj{font-weight:600}
         <li><strong>wind</strong>: 12 mph or more forecast at kickoff. <strong>extreme weather</strong>: heavy rain or very high wind; the passing game may barely happen, and that cuts the quarterback and receivers hard.</li>
         <li><strong>new QB</strong>: a different quarterback is starting this week. Receivers lose about 2.5 points on average in that first week, no matter who the new starter is.</li>
         <li><strong>teammate out</strong>: the usual lead back or lead receiver on his team is out, so there is more work to go around.</li>
+        <li><strong>injury</strong> (hamstring, shoulder, illness, and so on): the body part listed on the injury report. The designation (Questionable, Limited) only tells you whether he plays; once he's active, the <em>type</em> of injury is what matters. Players who play through a hamstring, a shoulder, a wrist, or an illness have averaged 1.5 to 3 points below their projection; an ankle or a knee for a receiver costs nothing. The adjustment shown next to the injury is applied to the projection, sized from those records and scaled down where the record is thin.</li>
       </ul>
       <p>All data is free and public. The board is rebuilt every evening after the injury reports come out, and again Saturday with the final designations and weather.</p>
     </div>
@@ -185,6 +186,7 @@ td.proj{font-weight:600}
     if(r.extreme) f.push(['extreme weather','bad']); else if(r.wind>=12) f.push([`wind ${Math.round(r.wind)}`,'warn']);
     if(r.new_starter||r.qb_changed) f.push(['new QB','warn']);
     if(r.lead_back_out||r.lead_receiver_out) f.push(['teammate out','good']);
+    if(r.injury) f.push([r.injury+(r.injury_adj<0?` ${Number(r.injury_adj).toFixed(1)}`:''), r.injury_adj<0?'warn':'']);
     if(r.status && r.status!=='none' && r.status!=='Out') f.push([r.status,'warn']);
     return f;
   }
@@ -222,7 +224,7 @@ td.proj{font-weight:600}
       <h2>${r.player}</h2><div class="sub">${r.position} · ${r.team} vs ${r.opp} · ${r.tier||''}${r.utilization?' · usage '+r.utilization:''}</div>
       <dl class="kv"><dt>Projection (median)</dt><dd><strong>${fmt(r.p50)}</strong></dd><dt>Floor / ceiling</dt><dd>${fmt(r.p10)} – ${fmt(r.p90)}</dd><dt>Mean</dt><dd>${fmt(r.mean)}</dd><dt>Season avg / last 3</dt><dd>${fmt(r.fp_season)} / ${fmt(r.fp_l3)}</dd><dt>Status</dt><dd>${r.status&&r.status!=='none'?r.status:'no designation'}${r.practice&&r.practice!=='none'?' · '+r.practice.replace(' Participation in Practice','').replace('Did Not Participate In Practice','DNP'):''}</dd></dl>
       <h3>Why: contributions vs an average ${r.position}</h3>
-      <div class="bars">${bar('Usage',r.contrib_usage,10,sgn(r.contrib_usage))}${bar('Game',r.contrib_environment,10,sgn(r.contrib_environment))}${bar('Pedigree',r.contrib_pedigree,10,sgn(r.contrib_pedigree))}${bar('Opponent',r.def_adj-(r.wind_adj||0),5,sgn(r.def_adj-(r.wind_adj||0)))}${bar('Wind',r.wind_adj,5,sgn(r.wind_adj))}</div>
+      <div class="bars">${bar('Usage',r.contrib_usage,10,sgn(r.contrib_usage))}${bar('Game',r.contrib_environment,10,sgn(r.contrib_environment))}${bar('Pedigree',r.contrib_pedigree,10,sgn(r.contrib_pedigree))}${bar('Opponent',r.def_adj-(r.wind_adj||0),5,sgn(r.def_adj-(r.wind_adj||0)))}${bar('Wind',r.wind_adj,5,sgn(r.wind_adj))}${r.injury?bar('Injury: '+r.injury,r.injury_adj,5,sgn(r.injury_adj)):''}</div>
       <h3>Usage, last 3 games</h3>
       <div class="bars">${shares.map(([l,v])=>`<div class="bar"><span>${l}</span><span class="track"><i style="left:0;width:${Math.min((v||0)*100,100)}%"></i></span><span class="v">${pct(v)}</span></div>`).join('')}</div>
       <dl class="kv" style="margin-top:8px"><dt>${r.position==='QB'?'Rush att / g':'Touches / g'}</dt><dd>${fmt(r.touches_l3)}</dd>${r.position!=='QB'?`<dt>Targets / g</dt><dd>${fmt(r.targets_l3)}</dd>`:''}${r.adot_l3!=null?`<dt>aDOT</dt><dd>${fmt(r.adot_l3)}</dd>`:''}${(r.lead_back_out||r.lead_receiver_out)?`<dt>Teammate out</dt><dd>yes</dd>`:''}${(r.new_starter||r.qb_changed)?`<dt>New QB this week</dt><dd>yes</dd>`:''}</dl>
@@ -232,7 +234,7 @@ td.proj{font-weight:600}
       <dl class="kv"><dt>Spread (team)</dt><dd>${sgn(r.spread)}</dd><dt>Implied total</dt><dd>${fmt(r.implied_total)}</dd><dt>Wind</dt><dd>${r.wind?Math.round(r.wind)+' mph':'calm / indoors'}</dd>${r.extreme?'<dt>Weather</dt><dd>extreme</dd>':''}${r.shootout?'<dt>Shootout recipe</dt><dd>yes</dd>':''}</dl>
       <h3>The opponent: ${r.opp}</h3>
       <dl class="kv"><dt>Effect on QBs</dt><dd>${def.def_qb_delta==null?'—':sgn(def.def_qb_delta*100)+' /100 db'}</dd><dt>Blitz rate</dt><dd>${pct(def.def_blitz)}</dd><dt>Pressure rate</dt><dd>${pct(def.def_pressure)}</dd><dt>Pass-D tier</dt><dd>${def.def_tier||r.def_tier||'—'}</dd>${r.position==='RB'?`<dt>Explosive runs allowed</dt><dd>${pct(def.def_expl_sus)} (${def.def_expl_tercile||'—'})</dd>`:''}</dl>
-      <p class="note">${r.weather_flag?r.weather_flag+'. ':''}Opponent adjustment of ${sgn(r.def_adj)} is applied to the mean and to the whole range; it is the same for every pass catcher on ${r.team}.</p>`;
+      <p class="note">${r.weather_flag?r.weather_flag+'. ':''}Opponent (${sgn(r.def_adj-(r.wind_adj||0)-(r.injury_adj||0))}), wind and injury adjustments are applied to the mean and to the whole range; the opponent effect is the same for every pass catcher on ${r.team}.</p>`;
     $('#closeDrawer').onclick=()=>{selected=null;renderDrawer();renderBoard();};
   }
 

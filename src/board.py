@@ -73,7 +73,7 @@ for pos, n in N.items():
     out.append(b[b["rank"] <= n])
 B = pd.concat(out)
 cols = ["rank", "tier", "utilization", "player", "position", "team", "opp", "spread", "p10", "p50", "p90", "mean", "fp_season", "fp_l3",
-        "snap_l3", "carry_share_l3", "target_share_l3", "rz_share", "def_tier", "shootout", "emerging", "status", "practice"]
+        "snap_l3", "carry_share_l3", "target_share_l3", "rz_share", "def_tier", "shootout", "emerging", "status", "practice", "injury", "injury_adj"]
 B = B[[c for c in cols if c in B]].round(2)
 B["espn"], B["actual"] = None, None
 B.to_csv(ROOT / "results" / f"board_{SEASON}_wk{WEEK}.csv", index=False)

@@ -116,7 +116,9 @@ coverage. `mean` — expected value, the number comparable to ESPN. `ceiling_fla
 — opponent pass defense on the absolute scale (relevant to QBs). `shootout` —
 1 when both offenses are top-third, spread ≤ 3.5, no top-7 pass defense.
 `contrib_usage / environment / matchup` — points attributable to each group.
-`def_qb_delta` — the opponent's individual effect on QBs (EPA/dropback vs
+`injury` / `injury_adj` — the body part listed on the report and the points it
+removes for an active player (hamstring −1.4, shoulder −1.2, illness −1.6,
+ankle 0 except RB −0.7; see FINDINGS). `def_qb_delta` — the opponent's individual effect on QBs (EPA/dropback vs
 their own averages, shrunk); `def_adj` — the points it adds to or removes from
 this player (10 × def_qb_delta, applied to mean and range); `def_blitz` — the
 opponent's blitz rate.

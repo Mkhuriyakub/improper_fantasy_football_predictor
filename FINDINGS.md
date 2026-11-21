@@ -223,11 +223,16 @@ and on the 2025 ladder at every position (QB 6.88→6.64, WR 6.22→6.14, TE
 points per player; the profile behind it (73% blitz rate, 25% pressure, worst
 short/intermediate CPOE allowed, −0.58 EPA in the red zone) is on the board.
 
-**Questionable players who play perform to their projection.** Top-N players
-with a Questionable/Limited designation who then played (2024–25, n=42): bias
-−0.01 vs projection (+1.1 in 2024, −1.5 in 2025). No injury discount is
-applied for a player who is active. The designation is shown on the board; the
-risk it carries is that he sits, not that he plays badly.
+**The injury, not the designation, predicts how an active player performs.**
+Top-N players who played with a listed injury (2024–25, bias vs players with
+nothing listed): illness −3.1 (n=30), calf −2.9 (16), wrist −2.3 (30),
+hamstring −2.2 (59; WR −2.6), shoulder −1.7 (65; QB −2.4), concussion −1.6
+(27), back −1.5 (29), knee −0.6 (114; QB −2.2, RB −2.0, WR +0.1), ankle 0.0
+(108; RB −1.4, WR/QB +0.8); foot, hip and quad slightly positive. The
+Questionable/Limited designation itself adds nothing once he plays (−0.01,
+n=42), and practice participation adds little within the soft-tissue group
+(DNP −0.9, limited −0.4, full −0.2). Applied as a structural adjustment,
+shrunk by n/(n+30), with position-specific values where the split is clear.
 
 **An early exit is not a role change.** A player who leaves a game hurt shows a
 tiny snap share for that game; `snap_last` (a TE input) now ignores a last
