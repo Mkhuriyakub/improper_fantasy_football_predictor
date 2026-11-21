@@ -49,8 +49,14 @@ to a real player; Out and new-QB overrides land in features and projections;
 Doubtful treated as Out; lead-back-out flags; wind matches the forecast file;
 rest-of-season Outs never appear), walk-forward hygiene (fp_season matches
 prior-week stats; no target-week score inside fp_l3; defense effect at week 1
-has no current-season dropbacks) and the UI export (same players as the board,
-required keys, one game per scheduled game, 32 defenses). The first run of the
+has no current-season dropbacks), the UI export (same players as the board,
+required keys, one game per scheduled game, 32 defenses), and **model
+regression**: `project.py` writes its 2025 walk-forward ladder to
+`results/validation_2025_latest.json`; `tests/validation_baseline.json` is the
+accepted state, and the chosen model at each position may not be worse than it
+by more than 0.03 MAE or 0.015 rank, must still beat the season average, and
+the training sample size may not drift more than 5%. Accept a deliberate
+change with `python tests/freeze_baseline.py` and say why in the commit. The first run of the
 suite found three live bugs: the soft-run-D flag written after the save, the
 new-QB override never reaching the model, and a misspelled override name that
 silently did nothing.

@@ -298,6 +298,9 @@ P.to_parquet(ROOT / "results" / f"projections_{SEASON}_wk{WEEK}.parquet", index=
 print("Walk-forward validation on", TRAIN, "(top-N + emerging players only; MAE in PPR points / within-week rank correlation):")
 for pos, n, sc, best in report:
     print(f"  {pos} (n={n}): " + " | ".join(f"{k}: {v['MAE']} / {v['rank']}" for k, v in sc.items()) + f"   -> using '{best}'")
+import json as _json
+_json.dump({pos: dict(n=int(n), chosen=best, **{k: dict(MAE=float(v["MAE"]), rank=float(v["rank"])) for k, v in sc.items()}) for pos, n, sc, best in report},
+           open(ROOT / "results" / f"validation_{TRAIN}_latest.json", "w"), indent=1)
 pd.set_option("display.width", 250)
 cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "weather_flag", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
