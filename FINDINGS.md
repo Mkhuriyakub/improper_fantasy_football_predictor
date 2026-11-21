@@ -223,6 +223,17 @@ and on the 2025 ladder at every position (QB 6.88→6.64, WR 6.22→6.14, TE
 points per player; the profile behind it (73% blitz rate, 25% pressure, worst
 short/intermediate CPOE allowed, −0.58 EPA in the red zone) is on the board.
 
+**Questionable players who play perform to their projection.** Top-N players
+with a Questionable/Limited designation who then played (2024–25, n=42): bias
+−0.01 vs projection (+1.1 in 2024, −1.5 in 2025). No injury discount is
+applied for a player who is active. The designation is shown on the board; the
+risk it carries is that he sits, not that he plays badly.
+
+**An early exit is not a role change.** A player who leaves a game hurt shows a
+tiny snap share for that game; `snap_last` (a TE input) now ignores a last
+game under half the prior games' average. Bowers week 11: 19% snaps in week
+10 (injured early) had cut his projection to 10.8; corrected, 14.7.
+
 ## Tested and rejected: these don't improve weekly projections
 
 - Team-level line metrics (adjusted line yards, stuff rate, sack rate,

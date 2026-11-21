@@ -190,6 +190,9 @@ for w in weeks:
         carry_share3 = float(np.average((l3.set_index("week").carries / team_carries.replace(0, np.nan)).fillna(0).values, weights=wts)) if len(l3) else np.nan
         snaps3 = [SNAP.get((pid, int(wk)), np.nan) for wk in l3.week]
         snap_last = snaps3[-1] if len(snaps3) else np.nan
+        # early exit (injury) in the last game: a share under half of the previous games' average is not a role change
+        if len(snaps3) >= 2 and not np.isnan(snaps3[-1]) and not all(np.isnan(snaps3[:-1])) and snaps3[-1] < 0.5 * np.nanmean(snaps3[:-1]):
+            snap_last = float(np.nanmean(snaps3[:-1]))
         snap_l3 = float(np.nanmean(snaps3)) if len(snaps3) and not all(np.isnan(snaps3)) else np.nan
         snap_trend = (snaps3[-1] - np.nanmean(snaps3[:-1])) if len(snaps3) >= 2 and not np.isnan(snaps3[-1]) and not all(np.isnan(snaps3[:-1])) else 0.0
         _tt = tt.set_index("week").reindex(l3.week); tgt_share3 = float(np.average((l3.targets.fillna(0).values / _tt.team_targets.replace(0, np.nan).fillna(1).values), weights=wts)) if len(l3) and tt.team_targets.sum() else np.nan

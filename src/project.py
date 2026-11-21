@@ -204,7 +204,11 @@ for pos, grp in GROUPS.items():
         P = P[top | emerging]
         scores[name] = dict(MAE=round((P.pred - P.fp).abs().mean(), 2),
                             rank=round(P.groupby("week").apply(lambda g: spearmanr(g.pred, g.fp).correlation, include_groups=False).mean(), 3))
-    best = min([k for k in scores if k not in ("naive", "season")], key=lambda k: scores[k]["MAE"])
+    # pick the simplest feature set unless a richer one beats it by a clear margin (0.02 MAE); avoids tie flips between runs
+    best = None
+    for k in [k for k in scores if k not in ("naive", "season")]:
+        if best is None or scores[k]["MAE"] < scores[best]["MAE"] - 0.02:
+            best = k
     # fall back to the season average only if it clearly beats the model on the top/emerging population
     # (ties go to the model: it is unbiased on top players where the season average over-projects by ~1 pt)
     use_season = pos != "QB" and scores[best]["MAE"] > scores["season"]["MAE"] + 0.10
