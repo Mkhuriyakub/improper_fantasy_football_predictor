@@ -1,14 +1,14 @@
 away,home,pick,prob,note
 IND,HOU,HOU,,final
-MIA,BUF,BUF,0.92,
-BAL,CAR,CAR,0.64,
+MIA,BUF,BUF,0.91,BUF +0.375 EPA/play last 4 (best in league); MIA starting McCord
+BAL,CAR,CAR,0.62,BAL on Brissett (Jackson/Huntley IR); BAL -0.24 EPA last 4; coin-flip line
 NO,CHI,CHI,0.79,
-TEN,DAL,DAL,0.76,
-TB,DET,DET,0.59,
-ARI,KC,KC,0.95,
-JAX,NYG,JAX,0.74,
-NYJ,LAC,LAC,0.55,
-LV,DEN,DEN,0.8,
-PIT,PHI,PIT,0.69,
-MIN,SF,SF,0.75,
-CIN,WAS,CIN,0.74,
+TEN,DAL,DAL,0.76,Ferguson Out for DAL
+TB,DET,DET,0.62,Mayfield Questionable (foot/thumb) - Daniels would start; Winfield Out
+ARI,KC,KC,0.94,Beck Questionable/DNP Fri; Walker III Out but KC +23 pts by EPA
+JAX,NYG,JAX,0.73,JAX +0.37 EPA/play last 4
+NYJ,LAC,LAC,0.55,Geno Smith back (full Fri / no designation); Cooper Jr. Out
+LV,DEN,DEN,0.80,
+PIT,PHI,PIT,0.67,PHI on Milton; Wicks Out; DeVonta Smith returns
+MIN,SF,SF,0.68,Mexico City; Murray and Addison Out; Cousins starts; Evans Questionable
+CIN,WAS,CIN,0.72,Monday; McLaurin out for season
