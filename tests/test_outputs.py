@@ -49,7 +49,7 @@ def test_no_bye_teams_on_board(board, sched, week):
 
 
 def test_board_ranks_and_counts(board):
-    limits = {"QB": 32, "RB": 30, "WR": 30, "TE": 24}
+    limits = {"QB": 32, "RB": 40, "WR": 60, "TE": 24}
     for pos, n in limits.items():
         b = board[board.position == pos]
         assert len(b) <= n

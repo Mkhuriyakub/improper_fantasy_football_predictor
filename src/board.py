@@ -1,4 +1,4 @@
-"""Weekly board: top 20 QB / 30 RB / 30 WR / 20 TE with projection tiers and utilization labels.
+"""Weekly board: all QB starters / 40 RB / 60 WR / 24 TE with projection tiers and utilization labels.
 
 Tiers are rank buckets of the projection (median; RB1 = 1-12, RB2 = 13-24, ...) with
 sub-tiers (a, b, c...) broken wherever the gap to the next player exceeds 1.5
@@ -15,7 +15,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 SEASON, WEEK = int(sys.argv[1]), int(sys.argv[2])
 BUCKET, GAP = 12, 1.5
-N = {"QB": 32, "RB": 30, "WR": 30, "TE": 24}  # every projected QB starter; deeper TE for 2-TE and superflex leagues
+N = {"QB": 32, "RB": 40, "WR": 60, "TE": 24}  # every projected QB starter; deeper TE for 2-TE and superflex leagues
 
 p = pd.read_parquet(ROOT / "results" / f"projections_{SEASON}_wk{WEEK}.parquet")
 sch = pd.read_parquet(ROOT / "data" / f"schedules_{SEASON}.parquet")
