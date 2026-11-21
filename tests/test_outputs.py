@@ -49,7 +49,7 @@ def test_no_bye_teams_on_board(board, sched, week):
 
 
 def test_board_ranks_and_counts(board):
-    limits = {"QB": 20, "RB": 30, "WR": 30, "TE": 20}
+    limits = {"QB": 32, "RB": 30, "WR": 30, "TE": 24}
     for pos, n in limits.items():
         b = board[board.position == pos]
         assert len(b) <= n
@@ -130,3 +130,9 @@ def test_ui_exports_match_board(board, season, week):
     assert len(games) == (sched.week == week).sum()
     defs = json.load(open(d / "defenses.json"))
     assert len(defs) == 32
+
+
+def test_one_quarterback_per_team(board):
+    q = board[board.position == "QB"]
+    dup = q[q.team.duplicated(keep=False)]
+    assert dup.empty, f"more than one QB listed for {sorted(dup.team.unique())}"

@@ -15,7 +15,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 SEASON, WEEK = int(sys.argv[1]), int(sys.argv[2])
 BUCKET, GAP = 12, 1.5
-N = {"QB": 20, "RB": 30, "WR": 30, "TE": 20}
+N = {"QB": 32, "RB": 30, "WR": 30, "TE": 24}  # every projected QB starter; deeper TE for 2-TE and superflex leagues
 
 p = pd.read_parquet(ROOT / "results" / f"projections_{SEASON}_wk{WEEK}.parquet")
 sch = pd.read_parquet(ROOT / "data" / f"schedules_{SEASON}.parquet")
@@ -51,6 +51,18 @@ def util(r):
     return "elite" if score >= 0.8 else "high" if score >= 0.65 else "mid" if score >= 0.5 else "low"
 
 
+# one quarterback per team: the expected starter from the QB tracker (most attempts in the team's last game, injury-aware);
+# if he is Out or unprojected, the best remaining non-Out QB on that team
+qt = pd.read_parquet(ROOT / "results" / f"qb_traits_{SEASON}.parquet")
+starter = qt[qt.week == WEEK].set_index("team").qb_id.to_dict()
+keep = []
+for team, g in p[p.position == "QB"].groupby("team"):
+    sid = starter.get(team)
+    row = g[g.player_id == sid]
+    if row.empty:
+        row = g.sort_values("mean", ascending=False).head(1)
+    keep.append(row.index[0])
+p = pd.concat([p[p.position != "QB"], p.loc[keep]])
 p["utilization"] = p.apply(util, axis=1)
 # emerging: recent production well above the season average AND not already an established top-12 player on the season
 season_rank = p.groupby("position").fp_season.rank(ascending=False)
