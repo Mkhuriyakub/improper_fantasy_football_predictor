@@ -57,9 +57,9 @@ def test_board_ranks_and_counts(board):
     assert not board.duplicated(["player", "position"]).any()
 
 
-def test_board_sorted_by_mean(board):
+def test_board_sorted_by_projection(board):
     for pos, b in board.groupby("position"):
-        assert (b["mean"].diff().dropna() <= 1e-9).all(), f"{pos} board not sorted by mean"
+        assert (b["p50"].diff().dropna() <= 1e-9).all(), f"{pos} board not sorted by projection (p50)"
 
 
 def test_tier_buckets_match_rank(board):

@@ -111,7 +111,7 @@ td.proj{font-weight:600}
       <div class="tablewrap">
         <table id="boardTable">
           <thead><tr>
-            <th data-k="rank" title="This week's rank by projected mean">Wk rank</th><th class="l" data-k="tier">Tier</th><th class="l" data-k="player">Player</th><th class="l" data-k="team">Tm</th><th class="l" data-k="opp">Opp</th>
+            <th data-k="rank" title="This week's rank by projection (median)">Wk rank</th><th class="l" data-k="tier">Tier</th><th class="l" data-k="player">Player</th><th class="l" data-k="team">Tm</th><th class="l" data-k="opp">Opp</th>
             <th data-k="p10">Floor</th><th data-k="p50" aria-sort="descending">Proj</th><th data-k="p90">Ceiling</th><th class="l">Range</th><th data-k="mean">Mean</th>
             <th data-k="fp_season" title="Season average, points per game">Season avg</th><th data-k="fp_l3" title="Last three games, points per game">Last 3 avg</th><th class="l" data-k="utilization">Usage</th><th data-k="def_adj">Opp adj</th><th class="l">Flags</th>
           </tr></thead>
@@ -120,7 +120,7 @@ td.proj{font-weight:600}
       </div>
       <aside class="drawer" id="drawer" hidden></aside>
     </div>
-    <p class="legend">Wk rank is this week's order by projected mean, not a season rank. Proj is the median (most likely score). Floor and ceiling are the 10th and 90th percentiles (about 80% of outcomes fall between). Mean is for adding players up and for comparing with ESPN. Click a row for the breakdown.</p>
+    <p class="legend">Wk rank is this week's order by Proj, not a season rank. Proj is the median (most likely score). Floor and ceiling are the 10th and 90th percentiles (about 80% of outcomes fall between). Mean is for adding players up and for comparing with ESPN. Click a row for the breakdown.</p>
   </section>
 
   <section id="view-games" hidden>
@@ -149,7 +149,7 @@ td.proj{font-weight:600}
       </ul>
       <p>The model deliberately does <em>not</em> use a lot of things you'll see elsewhere, because we tested them and they didn't predict anything: "points allowed to wide receivers," matchups against particular corners, coaching tendencies, offensive-line rankings. Each week's projections are checked against what actually happened and against the dumbest possible alternative, a player's season average; the running record is kept in the project's findings file.</p>
       <h2>Tiers and the Usage label</h2>
-      <p><strong>Tier</strong> groups players by rank: RB1 means a top-12 projection, RB2 means 13 to 24, and so on. The letter breaks each group where there's a real gap in the numbers: RB1-a players are clearly ahead of RB1-b players, while two players in the same letter are close enough to call a coin flip.</p>
+      <p><strong>Tier</strong> groups players by this week's rank on Proj: RB1 means a top-12 projection, RB2 means 13 to 24, and so on. The letter breaks each group where there's a real gap in the numbers: RB1-a players are clearly ahead of RB1-b players, while two players in the same letter are close enough to call a coin flip.</p>
       <p><strong>Usage</strong> is a separate label that ignores the projection and only looks at how much the player has been on the field and getting the ball lately: <strong>elite</strong>, <strong>high</strong>, <strong>mid</strong>, or <strong>low</strong>. The useful cases are where the two disagree. A player with elite usage but a modest projection is someone getting a lot of work and not doing much with it; the model doubts the output but the opportunity is real. A player with a strong projection and low usage is someone the model believes in for reasons beyond recent work, usually pedigree or a role that just changed. Those are the rows to think hardest about.</p>
       <h2>Flags</h2>
       <ul>

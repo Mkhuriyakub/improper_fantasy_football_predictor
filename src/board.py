@@ -1,6 +1,6 @@
 """Weekly board: top 20 QB / 30 RB / 30 WR / 20 TE with projection tiers and utilization labels.
 
-Tiers are rank buckets of the projected mean (RB1 = 1-12, RB2 = 13-24, ...) with
+Tiers are rank buckets of the projection (median; RB1 = 1-12, RB2 = 13-24, ...) with
 sub-tiers (a, b, c...) broken wherever the gap to the next player exceeds 1.5
 points. Utilization is a usage label from trailing snap share and carry/target
 share (elite / high / mid / low), independent of the projection.
@@ -26,10 +26,10 @@ for c in ["snap_l3", "carry_share_l3", "target_share_l3", "rz_share"]:
 
 
 def tiers(b, pos):
-    b = b.sort_values("mean", ascending=False).reset_index(drop=True)
+    b = b.sort_values("p50", ascending=False).reset_index(drop=True)  # rank and tiers follow the projection (median)
     b["rank"] = b.index + 1
     b["bucket"] = pos + ((b["rank"] - 1) // BUCKET + 1).astype(str)
-    gap = b["mean"].diff(-1).fillna(0)
+    gap = b["p50"].diff(-1).fillna(0)
     sub, k = [], 1
     for i in range(len(b)):
         sub.append(k)
