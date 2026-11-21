@@ -234,6 +234,15 @@ n=42), and practice participation adds little within the soft-tissue group
 (DNP −0.9, limited −0.4, full −0.2). Applied as a structural adjustment,
 shrunk by n/(n+30), with position-specific values where the split is clear.
 
+**A sole substitute keeps most of the work; a first-week fill-in gets less.**
+209 lead-back-out weeks, 2019–25 (lead ≥ 12 touches/g). The fill-in's touches:
+first week and he was a backup 12.5; first week with an existing role 15.7;
+lead already out and a committee 15.7; lead already out and the fill-in took
+65%+ of snaps 17.6 (n=20; 14.8 PPR; 75% reach 15 touches; last week's touches
+20.6 → 17.6, r=0.21). Rule: a "sole back" (lead Out, missed last game, 65%+
+snaps) is projected from last game's usage × 0.85 rather than the 3-game blend.
+Emmett Johnson week 11: 13.8 → 14.9 median.
+
 **An early exit is not a role change.** A player who leaves a game hurt shows a
 tiny snap share for that game; `snap_last` (a TE input) now ignores a last
 game under half the prior games' average. Bowers week 11: 19% snaps in week

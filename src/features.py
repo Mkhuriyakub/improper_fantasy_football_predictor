@@ -191,6 +191,10 @@ for w in weeks:
         share3 = float(np.average((l3.set_index("week").touches / team_touch).fillna(0).values, weights=wts)) if len(l3) else np.nan
         team_carries = tm[tm.week.isin(l3.week) & (tm.position != "QB")].groupby("week").carries.sum()
         carry_share3 = float(np.average((l3.set_index("week").carries / team_carries.replace(0, np.nan)).fillna(0).values, weights=wts)) if len(l3) else np.nan
+        last_row = l3.iloc[-1] if len(l3) else None
+        touches_last = float(last_row.touches) if last_row is not None else np.nan
+        carries_last = float(last_row.carries) if last_row is not None else np.nan
+        targets_last = float(last_row.targets) if last_row is not None else np.nan
         snaps3 = [SNAP.get((pid, int(wk)), np.nan) for wk in l3.week]
         snap_last = snaps3[-1] if len(snaps3) else np.nan
         # early exit (injury) in the last game: a share under half of the previous games' average is not a role change
@@ -205,6 +209,7 @@ for w in weeks:
         recent = tm[tm.week >= w - 3]
         lead_rb = recent[recent.position == "RB"].groupby("player_id").touches.sum().idxmax() if len(recent[recent.position == "RB"]) else None
         lead_wr = recent[recent.position.isin(["WR", "TE"])].groupby("player_id").targets.sum().idxmax() if len(recent[recent.position.isin(["WR", "TE"])]) else None
+        lead_missed_last = int(lead_rb is not None and lead_rb != pid and len(l3) > 0 and not ((tm.week == l3.week.iloc[-1]) & (tm.player_id == lead_rb) & (tm.touches > 0)).any())
         status = inj_w[(inj_w.week == w) & (inj_w.player_id == pid)] if inj_w is not None else pd.DataFrame()
         ls = inj_w[(inj_w.week == w) & (inj_w.player_id == lead_rb)] if inj_w is not None else pd.DataFrame()
         lws = inj_w[(inj_w.week == w) & (inj_w.player_id == lead_wr)] if inj_w is not None else pd.DataFrame()
@@ -221,6 +226,7 @@ for w in weeks:
             adot_l3=(l3.receiving_air_yards.sum() / max(1, l3.targets.sum())) if l3.targets.sum() else np.nan,
             touch_share_l3=share3, target_share_l3=tgt_share3, air_share_l3=air_share3, carry_share_l3=carry_share3,
             snap_last=snap_last, snap_l3=snap_l3, snap_trend=snap_trend,
+            touches_last=touches_last, carries_last=carries_last, targets_last=targets_last, lead_missed_last=lead_missed_last,
             gl_share=pe.gl.sum() / max(1, pe.touches.sum()), rz_share=pe.rz_touches.sum() / max(1, pe.touches.sum()),
             trail_share=trail_share, neutral_share=neutral_share,
             script_sens=(trail_share - neutral_share) if pd.notna(trail_share) and pd.notna(neutral_share) else 0.0,

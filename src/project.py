@@ -234,6 +234,16 @@ for pos, grp in GROUPS.items():
     # ---- final fit on full training season with the best feature set, plus quantiles
     cols = ladder[best]
     te = prep(te_all, pos)
+    # Sole substitute: the lead back is Out, already missed the last game, and this back took 65%+ of the snaps in it.
+    # 2019-25 (n=20): such backs got 17.6 touches / 14.8 PPR the next week (last game 20.6 touches; r=0.21 with the
+    # next week). Use last game's usage x0.85 as the usage input instead of the 3-game blend that averages in backup weeks.
+    te["sole_sub"] = 0
+    if pos == "RB" and {"lead_back_out", "lead_missed_last", "snap_last", "touches_last"} <= set(te.columns):
+        sole = (te.lead_back_out == 1) & (te.lead_missed_last == 1) & (te.snap_last >= 0.65) & te.touches_last.notna()
+        te.loc[sole, "sole_sub"] = 1
+        for c, lastc in (("touches_l3", "touches_last"), ("carries_l3", "carries_last"), ("targets_l3", "targets_last")):
+            te.loc[sole, c] = np.maximum(te.loc[sole, c], 0.85 * te.loc[sole, lastc])
+        te.loc[sole, "touch_share_l3"] = np.maximum(te.loc[sole, "touch_share_l3"], 0.7)
     Xa, Xb = fill(tr, te, cols)
     sc = StandardScaler().fit(Xa)
     Xa_s, Xb_s = sc.transform(Xa), sc.transform(Xb)
@@ -324,7 +334,7 @@ import json as _json
 _json.dump({pos: dict(n=int(n), chosen=best, **{k: dict(MAE=float(v["MAE"]), rank=float(v["rank"])) for k, v in sc.items()}) for pos, n, sc, best in report},
            open(ROOT / "results" / f"validation_{TRAIN}_latest.json", "w"), indent=1)
 pd.set_option("display.width", 250)
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "injury_adj", "injury", "weather_flag", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "injury_adj", "injury", "sole_sub", "weather_flag", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
     sel = P[P.player.isin(NAMES)]
 else:
