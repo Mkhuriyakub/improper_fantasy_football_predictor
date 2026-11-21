@@ -243,6 +243,15 @@ lead already out and a committee 15.7; lead already out and the fill-in took
 snaps) is projected from last game's usage × 0.85 rather than the 3-game blend.
 Emmett Johnson week 11: 13.8 → 14.9 median.
 
+**Returning players come back at 65–85% of their prior production.** First game
+after missing 3+ weeks (2019–25, n=218, prior 4-game average ≥ 8 PPR): RB 80%
+of prior points (87% of opportunities), WR 85%, TE 75%, QB 65%; 84% after 3–4
+missed games, 65% after 5+. Only 30% match their prior average. Previously the
+model dropped anyone absent more than three weeks (David Montgomery week 11
+had no projection); returning players are now projected from pre-absence usage
+with that discount and a "returning" flag. Missed games are counted, not
+calendar weeks, so a bye doesn't lengthen the absence.
+
 **An early exit is not a role change.** A player who leaves a game hurt shows a
 tiny snap share for that game; `snap_last` (a TE input) now ignores a last
 game under half the prior games' average. Bowers week 11: 19% snaps in week

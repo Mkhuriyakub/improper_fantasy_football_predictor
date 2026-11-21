@@ -161,6 +161,7 @@ td.proj{font-weight:600}
         <li><strong>new QB</strong>: a different quarterback is starting this week. Receivers lose about 2.5 points on average in that first week, no matter who the new starter is.</li>
         <li><strong>teammate out</strong>: the usual lead back or lead receiver on his team is out, so there is more work to go around. First-week fill-ins have averaged 12 to 16 touches depending on whether they already had a role.</li>
         <li><strong>sole back</strong>: the lead back is out, already missed last week, and this back took 65% or more of the snaps in that game. Backs in that spot have averaged about 17–18 touches and 15 points the following week, with three of four getting 15+ touches, so his projection is built from last week's workload rather than his season-long backup usage. The range stays wide because last week's touch count is a weak guide to this week's.</li>
+        <li><strong>returning</strong>: first game back after missing three or more weeks. Players in that spot have averaged 65–85% of their pre-injury production (backs 80%, receivers 85%, tight ends 75%, quarterbacks 65%; less after a five-week-plus absence), with fewer touches and only three in ten matching their old average. The projection is built from his pre-absence usage with that discount applied.</li>
         <li><strong>injury</strong> (hamstring, shoulder, illness, and so on): the body part listed on the injury report. The designation (Questionable, Limited) only tells you whether he plays; once he's active, the <em>type</em> of injury is what matters. Players who play through a hamstring, a shoulder, a wrist, or an illness have averaged 1.5 to 3 points below their projection; an ankle or a knee for a receiver costs nothing. The adjustment shown next to the injury is applied to the projection, sized from those records and scaled down where the record is thin.</li>
       </ul>
       <p>All data is free and public. The board is rebuilt every evening after the injury reports come out, and again Saturday with the final designations and weather.</p>
@@ -186,6 +187,7 @@ td.proj{font-weight:600}
     if(r.def_qb_delta!=null && r.def_qb_delta<=tc) f.push(['tough pass D','bad']);
     if(r.extreme) f.push(['extreme weather','bad']); else if(r.wind>=12) f.push([`wind ${Math.round(r.wind)}`,'warn']);
     if(r.new_starter||r.qb_changed) f.push(['new QB','warn']);
+    if(r.return_factor && r.return_factor<1) f.push([`returning (${r.missed_weeks} wk out)`,'warn']);
     if(r.sole_sub) f.push(['sole back','good']); else if(r.lead_back_out||r.lead_receiver_out) f.push(['teammate out','good']);
     if(r.injury) f.push([r.injury+(r.injury_adj<0?` ${Number(r.injury_adj).toFixed(1)}`:''), r.injury_adj<0?'warn':'']);
     if(r.status && r.status!=='none' && r.status!=='Out') f.push([r.status,'warn']);

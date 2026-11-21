@@ -40,6 +40,10 @@ stats = load("player_stats")
 stats = stats[stats.season_type == "REG"].copy()
 sched = load("schedules")
 sched = sched[sched.game_type == "REG"].copy()
+# weeks each team actually plays (to count missed games rather than calendar weeks across a bye)
+TEAM_WEEKS = {}
+for _r in sched.itertuples():
+    TEAM_WEEKS.setdefault(_r.home_team, set()).add(int(_r.week)); TEAM_WEEKS.setdefault(_r.away_team, set()).add(int(_r.week))
 inj = load("injuries")
 rost = load("rosters")
 snaps = load("snaps")
@@ -161,6 +165,7 @@ vegas["implied_total"] = vegas.total_line / 2 - vegas.spread / 2
 inj_w = inj[["week", "team", "gsis_id", "report_status", "practice_status", "report_primary_injury", "practice_primary_injury"]].rename(columns={"gsis_id": "player_id"}) if inj is not None else None
 if inj_w is not None:
     inj_w["injury"] = inj_w.report_primary_injury.fillna(inj_w.practice_primary_injury).str.lower().str.strip()
+    inj_w.loc[inj_w.injury.str.contains("not injury related", na=False), "injury"] = ""  # rest days are not injuries
     inj_w = inj_w.drop(columns=["report_primary_injury", "practice_primary_injury"])
 if inj_w is not None:  # Doubtful is treated as Out for projection purposes (historically ~90% inactive)
     inj_w["report_status"] = inj_w.report_status.replace({"Doubtful": "Out"})
@@ -219,6 +224,7 @@ for w in weeks:
         rows.append(dict(
             season=SEASON, week=w, player_id=pid, player=ph.player_display_name.iat[-1], position=pos, team=team, opp=opp,
             games_prior=len(ph), weeks_since_last=w - ph.week.iat[-1],
+            games_missed=int(((TEAM_WEEKS.get(team, set()) & set(range(int(ph.week.iat[-1]) + 1, w)))).__len__()),
             fp_l3=wm(l3.fp), fp_season=ph.fp.mean(), fp_std_l3=wm(l3.fp_std), rush_fp_l3=wm(l3.rush_fp), rec_fp_l3=wm(l3.rec_fp),
             touches_l3=wm(l3.touches), carries_l3=wm(l3.carries), targets_l3=wm(l3.targets),
             attempts_l3=wm(l3.attempts), pass_yds_l3=wm(l3.passing_yards), pass_td_l3=wm(l3.passing_tds),

@@ -142,3 +142,13 @@ def test_one_quarterback_per_team(board):
     q = board[board.position == "QB"]
     dup = q[q.team.duplicated(keep=False)]
     assert dup.empty, f"more than one QB listed for {sorted(dup.team.unique())}"
+
+
+def test_return_factor_bounds(proj):
+    assert proj.return_factor.between(0.6, 1.0).all()
+    fresh = proj[proj.missed_weeks < 3]
+    assert (fresh.return_factor == 1.0).all(), "return discount applied to a player who did not miss 3+ weeks"
+
+
+def test_no_rest_days_as_injuries(proj):
+    assert not proj.injury.fillna("").str.contains("not injury related").any()

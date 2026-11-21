@@ -181,10 +181,23 @@ MIN_USAGE = {"RB": ("touches_l3", 6), "WR": ("targets_l3", 3), "TE": ("targets_l
 TOPN = {"RB": 24, "WR": 36, "TE": 12, "QB": 16}  # validation is scored on these plus emerging players
 
 
-def prep(df, pos):
+def prep(df, pos, returning=False):
+    """Training rows: players who played within the last 3 weeks. Prediction rows (returning=True) also keep players back
+    from a 3-10 week absence; they are projected from their pre-absence usage and discounted (RETURN_DISCOUNT)."""
     col, mn = MIN_USAGE[pos]
-    d = df[(df.position == pos) & (df[col] >= mn) & (df.status != "Out") & (df.weeks_since_last <= 3)].copy()
+    d = df[(df.position == pos) & (df[col] >= mn) & (df.status != "Out") & (df.weeks_since_last <= (10 if returning else 3))].copy()
     return d
+
+
+# First game back after missing 3+ weeks, 2019-25 (n=218, prior 4-game avg >= 8 PPR): points vs prior average.
+# RB 0.80, WR 0.85, TE 0.75, QB 0.65 for 3-4 missed weeks; 0.65 for 5+ at every position. Opportunities fall similarly.
+RETURN_DISCOUNT = {"RB": 0.80, "WR": 0.85, "TE": 0.75, "QB": 0.65}
+
+
+def return_factor(pos, missed):
+    if missed < 3:
+        return 1.0
+    return RETURN_DISCOUNT[pos] if missed <= 4 else 0.65
 
 
 def fill(train, test, cols):
@@ -233,7 +246,9 @@ for pos, grp in GROUPS.items():
     report.append((pos, len(tr), scores, best))
     # ---- final fit on full training season with the best feature set, plus quantiles
     cols = ladder[best]
-    te = prep(te_all, pos)
+    te = prep(te_all, pos, returning=True)
+    te["missed_weeks"] = te.games_missed if "games_missed" in te else (te.weeks_since_last - 1).clip(lower=0)
+    te["return_factor"] = te.missed_weeks.apply(lambda m: return_factor(pos, m))
     # Sole substitute: the lead back is Out, already missed the last game, and this back took 65%+ of the snaps in it.
     # 2019-25 (n=20): such backs got 17.6 touches / 14.8 PPR the next week (last game 20.6 touches; r=0.21 with the
     # next week). Use last game's usage x0.85 as the usage input instead of the 3-game blend that averages in backup weeks.
@@ -288,12 +303,12 @@ for pos, grp in GROUPS.items():
     # shrunk toward 0 by n/(n+30)); the designation itself carries no effect once he plays. Not learned; applied.
     te["injury_adj"] = te.apply(lambda r: injury_adjust(r.get("injury", ""), pos), axis=1) if "injury" in te else 0.0
     te["def_adj"] = DEF_C[pos] * te.def_qb_delta + te.wind_adj + te.injury_adj
-    te["mean"] = ((te.mean_pass + te.mean_rush) if pos == "QB" else (te.fp_season if use_season else med.predict(Xb_s))) + te.def_adj
+    te["mean"] = ((te.mean_pass + te.mean_rush) if pos == "QB" else (te.fp_season if use_season else med.predict(Xb_s))) * te.return_factor + te.def_adj
     if pos == "QB":
-        te["mean_pass"] = te.mean_pass + te.def_adj
+        te["mean_pass"] = te.mean_pass * te.return_factor + te.def_adj
     te["p10"], te["p50"], te["p90"] = q10.predict(Xb_s), q50.predict(Xb_s), q90.predict(Xb_qs)
     for c in ("p10", "p50", "p90"):
-        te[c] = te[c] + te.def_adj
+        te[c] = te[c] * te.return_factor + te.def_adj
     # group contributions: sum of (standardized feature * coef) by group, relative to an average player
     contrib = pd.DataFrame(Xb_s * med.coef_, columns=cols, index=te.index)
     for gname, gcols in {**grp, "pedigree": PEDIGREE}.items():
@@ -334,7 +349,7 @@ import json as _json
 _json.dump({pos: dict(n=int(n), chosen=best, **{k: dict(MAE=float(v["MAE"]), rank=float(v["rank"])) for k, v in sc.items()}) for pos, n, sc, best in report},
            open(ROOT / "results" / f"validation_{TRAIN}_latest.json", "w"), indent=1)
 pd.set_option("display.width", 250)
-cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "injury_adj", "injury", "sole_sub", "weather_flag", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
+cols = ["player", "position", "team", "opp", "p10", "p50", "p90", "mean", "ceiling_flag", "shootout", "def_tier", "def_qb_delta", "def_adj", "wind_adj", "injury_adj", "injury", "sole_sub", "missed_weeks", "return_factor", "weather_flag", "def_blitz", "contrib_usage", "contrib_environment", "contrib_matchup", "status", "practice"]
 if NAMES:
     sel = P[P.player.isin(NAMES)]
 else:
