@@ -1,14 +1,14 @@
 away,home,pick,prob,note
 IND,HOU,HOU,,final
-MIA,BUF,BUF,0.91,BUF +0.375 EPA/play last 4 (best in league); MIA starting McCord
-BAL,CAR,CAR,0.62,BAL on Brissett (Jackson/Huntley IR); BAL -0.24 EPA last 4; coin-flip line
-NO,CHI,CHI,0.79,
-TEN,DAL,DAL,0.76,Ferguson Out for DAL
-TB,DET,DET,0.62,Mayfield Questionable (foot/thumb) - Daniels would start; Winfield Out
-ARI,KC,KC,0.94,Beck Questionable/DNP Fri; Walker III Out but KC +23 pts by EPA
+MIA,BUF,BUF,0.92,BUF +0.40 EPA/play last 4 (best in league); MIA starting McCord
+BAL,CAR,CAR,0.65,BAL on Brissett (Jackson/Huntley IR); BAL -0.25 EPA last 4; coin-flip line
+NO,CHI,CHI,0.8,Kamara plays (good to go); CHI off bye
+TEN,DAL,DAL,0.75,Ferguson Out for DAL; Spears to IR for TEN
+TB,DET,DET,0.54,"Mayfield Questionable (foot/thumb), expected to play; Winfield Out; TB +0.22 EPA last 4 vs DET +0.15"
+ARI,KC,KC,0.93,Beck downgraded to Out; Josh Johnson starts (ARI 4th QB in 4 weeks); Walker III Out but KC +0.19 EPA last 4
 JAX,NYG,JAX,0.73,JAX +0.37 EPA/play last 4
-NYJ,LAC,LAC,0.55,Geno Smith back (full Fri / no designation); Cooper Jr. Out
-LV,DEN,DEN,0.80,
-PIT,PHI,PIT,0.67,PHI on Milton; Wicks Out; DeVonta Smith returns
-MIN,SF,SF,0.68,Mexico City; Murray and Addison Out; Cousins starts; Evans Questionable
-CIN,WAS,CIN,0.72,Monday; McLaurin out for season
+NYJ,LAC,LAC,0.52,Geno Smith back (no designation); Cooper Jr. and I. Williams Out; LAC -0.24 EPA last 4
+LV,DEN,DEN,0.82,"Bowers Questionable, likely plays; LV worst net EPA last 4"
+PIT,PHI,PIT,0.69,PHI on Milton; Wicks to IR; DeVonta Smith returns; Roman Wilson activated for PIT
+MIN,SF,SF,0.68,Mexico City; Murray and Addison Out; Cousins starts; Evans reportedly set to play
+CIN,WAS,CIN,0.73,Monday; McLaurin out for season; Croskey-Merritt (R48) could be activated

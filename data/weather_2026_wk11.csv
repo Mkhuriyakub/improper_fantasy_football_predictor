@@ -1,10 +1,11 @@
 home_team,wind,temp,precip,extreme,source
-BUF,9,60,32,0,nflweather.com 2026-11-20
-CHI,13,58,7,0,nflweather.com 2026-11-20
-KC,15,48,0,0,nflweather.com 2026-11-20
-CAR,6,64,0,0,nflweather.com 2026-11-20
-PHI,6,62,21,0,nflweather.com 2026-11-20
-NYG,7,55,27,0,nflweather.com 2026-11-20
-DEN,3,45,2,0,nflweather.com 2026-11-20
-WAS,9,52,0,0,nflweather.com 2026-11-20
-SF,,,,0,Mexico City - forecast not yet posted
+HOU,3,64,0,0,nflweather.com 2026-11-21 (final)
+BUF,11,59,32,0,nflweather.com 2026-11-21
+CHI,12,57,7,0,nflweather.com 2026-11-21
+KC,14,49,0,0,nflweather.com 2026-11-21
+CAR,6,64,5,0,nflweather.com 2026-11-21
+PHI,8,63,21,0,nflweather.com 2026-11-21
+NYG,5,61,27,0,nflweather.com 2026-11-21
+DEN,5,45,0,0,nflweather.com 2026-11-21
+WAS,9,54,0,0,nflweather.com 2026-11-21
+SF,,,,0,Mexico City - forecast not yet posted on nflweather.com (AccuWeather: dry and sunny expected)
