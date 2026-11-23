@@ -1,11 +1,11 @@
 home_team,wind,temp,precip,extreme,source
 HOU,3,64,0,0,nflweather.com 2026-11-21 (final)
-BUF,11,59,32,0,nflweather.com 2026-11-21
-CHI,12,57,7,0,nflweather.com 2026-11-21
-KC,14,49,0,0,nflweather.com 2026-11-21
-CAR,6,64,5,0,nflweather.com 2026-11-21
-PHI,8,63,21,0,nflweather.com 2026-11-21
-NYG,5,61,27,0,nflweather.com 2026-11-21
-DEN,5,45,0,0,nflweather.com 2026-11-21
-WAS,9,54,0,0,nflweather.com 2026-11-21
-SF,,,,0,Mexico City - forecast not yet posted on nflweather.com (AccuWeather: dry and sunny expected)
+BUF,11,59,32,0,nflweather.com 2026-11-21 (final)
+CHI,12,57,7,0,nflweather.com 2026-11-21 (final)
+KC,14,49,0,0,nflweather.com 2026-11-21 (final)
+CAR,6,64,5,0,nflweather.com 2026-11-21 (final)
+PHI,8,63,21,0,nflweather.com 2026-11-21 (final)
+NYG,5,61,27,0,nflweather.com 2026-11-21 (final)
+DEN,5,45,0,0,nflweather.com 2026-11-21 (final)
+WAS,9,50,0,0,nflweather.com 2026-11-22 (Monday night)
+SF,1,62,0,0,nflweather.com 2026-11-22 (Mexico City; site may map venue to Santa Clara - AccuWeather: dry and sunny in Mexico City)
