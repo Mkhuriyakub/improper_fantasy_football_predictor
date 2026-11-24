@@ -13,7 +13,8 @@ for y in range(2015, 2024):
     if not os.path.exists(p): nfl.load_player_stats(y).to_pandas().to_parquet(p,index=False)
 if not os.path.exists('data/draft_picks.parquet'): nfl.load_draft_picks().to_pandas().to_parquet('data/draft_picks.parquet',index=False)
 PY
-for y in 2025 $S; do python src/expl_traits.py $y; python src/qb_traits.py $y; python src/def_tiers.py $y; python src/def_effect.py $y; python src/pedigree.py $y; done
+for y in 2025 $S; do python src/expl_traits.py $y; python src/qb_traits.py $y; python src/def_tiers.py $y; python src/def_effect.py $y; python src/pedigree.py $y; python src/qb_efficiency.py $y; done
+[ -f results/qb_efficiency_2024.parquet ] || python src/qb_efficiency.py 2024   # second QB training season (needs pbp 2023-24)
 [ -f results/features_2025.parquet ] || python src/features.py 2025
 python src/features.py $S $W
 python src/project.py 2025 $S $W

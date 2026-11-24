@@ -1,6 +1,6 @@
 # The model, as it stands
 
-Updated through week 9, 2026.
+Updated through week 11, 2026.
 
 ## Pipeline
 
@@ -11,6 +11,7 @@ python src/qb_traits.py 2026            # each team's expected starter and his p
 python src/def_tiers.py 2026            # pass-defense rating on the absolute 2000-25 scale
 python src/def_effect.py 2026           # each defense's individual effect on opposing QBs vs their own averages
 python src/pedigree.py 2026             # draft capital, experience, prior-season efficiency (needs player_stats 2018+)
+python src/qb_efficiency.py 2026        # walk-forward passing efficiency per QB (EPA/db, success, ANY/A, pts/dropback); also 2024 once
 python src/features.py 2026 <week>      # walk-forward feature table for the target week
 python src/project.py 2025 2026 <week> [player names...]   # fit on 2025, project the week
 python src/board.py 2026 <week>         # top 20/30/30/20 with tiers and utilization labels -> results/board_*.csv
@@ -94,7 +95,7 @@ Per player, using only games before the target week:
 |---|---|---|---|
 | RB | usage + pedigree (+ environment) | trailing usage, shares, role flags, script sensitivity; draft pick, experience, prior-season efficiency and volume | quantile regression on total pts; p90 adds opponent explosive-run susceptibility |
 | WR / TE | usage + pedigree (+ environment) | trailing usage, target/air-yard shares, aDOT, role flags, new-starter flag; pedigree as above | quantile regression |
-| QB | passing + rushing, summed | passing: trailing passing pts, attempts, QB efficiency, environment, absolute-scale pass-defense rating, pressure/sack/blitz; rushing: trailing rush yards/carries, spread, implied total | quantile regression on total pts |
+| QB | passing + rushing, summed (fit on 2024+2025) | passing: trailing passing pts, attempts, QB efficiency (EPA/db, CPOE, success rate, ANY/A, pts per dropback, dropbacks/g), environment, absolute-scale pass-defense rating, pressure/sack/blitz; rushing: trailing rush yards/carries, spread, implied total | quantile regression on total pts (usage incl. efficiency + environment) |
 
 **Validation is scored on the players that matter**: the top-N by season
 average at each position (RB 24, WR 36, TE 12, QB 16) plus "emerging" players
@@ -145,7 +146,10 @@ opponent's blitz rate.
 | QB | 370 | 6.9 | 0.25 | 6.9 |
 
 QB rank accuracy is the weakest; separating one starter's week from another's
-is close to noise for every model we've tested.
+is close to noise for every model we've tested. Current ladder (top-16 +
+emerging, QB fit on 2024+2025): usage+env 6.66 / 0.224 vs season average
+7.15 / 0.131; on 2026 live weeks 7–11 the efficiency-aware model scores
+6.42 / 0.36 against 6.47 / 0.33 for the previous one (see FINDINGS).
 
 
 ## Assessment criteria by position (as of week 11, 2026)
@@ -157,8 +161,9 @@ and ceiling, fit separately from the mean). The validation ladder scores each
 feature set on top-N + emerging players against a season-average baseline and
 keeps whichever wins; the current selection is noted per position.
 
-### Quarterback — split model, passing + rushing (ladder: "full")
+### Quarterback — split model, passing + rushing (ladder: "usage+env"; trained on 2024 + 2025)
 - **Passing volume/efficiency:** passing pts last 3 (snap-weighted) and season, attempts, pass yards, pass TDs last 3; his own EPA/dropback (walk-forward).
+- **Passing efficiency (`src/qb_efficiency.py`, added week 12):** season-to-date EPA/dropback, success rate, ANY/A, passing points per dropback, dropbacks/g and their product, prior season at half weight, 100-dropback prior. In the passing mean and in the median's input set, so the headline projection sees how good the passer is, not only how many points he has scored. Passing ridge alpha 60 → 20. The QB models are fit on 2024 + 2025 (877 QB-weeks) rather than 2025 alone.
 - **Offense:** dropbacks/g, pass success rate, red-zone plays/g, plays/g, pass rate over expected, plays/drive, pass EPA.
 - **Game:** spread, implied total, total, dome, opponent pace and three-and-out rate.
 - **Opponent (learned):** absolute-scale pass-defense rating, yards/att allowed, pressure, sack and blitz rates.

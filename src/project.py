@@ -128,6 +128,40 @@ def add_cpoe(df, season):
 
 
 tr_all, te_all = add_cpoe(tr_all, TRAIN), add_cpoe(te_all, SEASON)
+
+
+def add_efficiency(df, season):
+    """Walk-forward passing efficiency (src/qb_efficiency.py): EPA/dropback, success rate, ANY/A, passing points per
+    dropback, dropbacks/g and their product, shrunk toward league average. QB inputs only (median and passing mean).
+    Tested 2024+2025 walk-forward and 2026 live: neutral on 2025, better MAE and rank on 2026 weeks 7-11; see FINDINGS."""
+    f = ROOT / "results" / f"qb_efficiency_{season}.parquet"
+    if not f.exists():
+        for c in QB_EFF:
+            df[c] = np.nan
+        return df
+    e = pd.read_parquet(f)
+    return df.merge(e[["player_id", "week"] + QB_EFF], on=["player_id", "week"], how="left")
+
+
+QB_EFF = ["eff_epa", "eff_sr", "eff_anya", "eff_fp_db", "db_pg", "exp_pass_fp"]
+tr_all, te_all = add_efficiency(tr_all, TRAIN), add_efficiency(te_all, SEASON)
+
+
+def load_extra_train(season):
+    """A second training season for the QB models (2024 alongside 2025): doubles the sample, which on 2026 live weeks
+    raised rank accuracy for every QB variant tested (0.26 -> 0.33) and was neutral on the 2025 walk-forward."""
+    f = ROOT / "results" / f"features_{season}.parquet"
+    need = [ROOT / "results" / f"{n}_{season}.parquet" for n in ("expl_def", "expl_rb", "qb_traits", "def_tiers", "pedigree", "def_effect", "qb_efficiency")]
+    if not f.exists() or not all(p.exists() for p in need):
+        print(f"  (no {season} training files; QB models fit on {TRAIN} only)")
+        return None
+    d = pd.read_parquet(f)
+    for fn in (add_expl, add_qb, add_qb_components, add_def_tiers, add_pedigree, add_def_effect, add_cpoe, add_efficiency):
+        d = fn(d, season)
+    return d
+
+
+QB_TRAIN_EXTRA = load_extra_train(TRAIN - 1)
 # Validated 2024+2025 on top+emerging: c=10 lowers MAE for WR/TE/RB in 5 of 6 season-position cells and removes most of
 # the -1 to -2.5 under-performance of pass catchers against the toughest 15% of defenses. Ridge learns it at half strength.
 DEF_C = {"WR": 10.0, "TE": 10.0, "RB": 10.0, "QB": 10.0}
@@ -147,7 +181,8 @@ def injury_adjust(injury, pos):
             return INJURY_ADJ_POS.get((pos, k), INJURY_ADJ[k])
     return 0.0
 PEDIGREE = ["top64", "log_pick", "exp", "prior_fp_per_opp", "prior_opp_pg"]
-_QB_PASS_BASE = ["pass_fp_l3", "pass_fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "qb_epa", "cpoe_std"]
+_QB_PASS_BASE = ["pass_fp_l3", "pass_fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "qb_epa", "cpoe_std"] + QB_EFF
+QB_PASS_ALPHA = 20  # was 60 on 2025 alone; with two training seasons and the efficiency inputs, 20 scored best on 2025 and 2026
 _QB_PASS_TAIL = [
     "off_dropbacks_pg", "off_pass_sr", "off_rz_plays_pg", "def_rel_epa", "opp_def_ypa_allowed", "opp_def_pressure_rate",
     "opp_def_sack_rate", "opp_def_blitz_rate"]  # def_rel_epa: absolute-scale pass D rating (validated 2025: better rank, less bias vs strong D)
@@ -170,7 +205,7 @@ GROUPS = {
         "matchup": ["opp_def_pass_epa_allowed", "opp_def_ypa_allowed", "opp_def_pressure_rate", "opp_def_blitz_rate", "pass_edge"],
     },
     "QB": {
-        "usage": ["fp_l3", "fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "rush_yds_l3", "carries_l3"],
+        "usage": ["fp_l3", "fp_season", "attempts_l3", "pass_yds_l3", "pass_td_l3", "rush_yds_l3", "carries_l3"] + QB_EFF,
         "environment": COMMON_ENV + ["off_dropbacks_pg", "off_pass_sr", "off_rz_plays_pg"],
         "matchup": ["opp_def_pass_epa_allowed", "opp_def_ypa_allowed", "opp_def_pressure_rate", "opp_def_sack_rate", "opp_def_blitz_rate", "pass_edge"],
     },
@@ -209,6 +244,8 @@ report = []
 projections = []
 for pos, grp in GROUPS.items():
     tr = prep(tr_all, pos)
+    if pos == "QB" and QB_TRAIN_EXTRA is not None:
+        tr = pd.concat([prep(QB_TRAIN_EXTRA, pos), tr], ignore_index=True)
     tr = tr[tr.played == 1]
     all_cols = grp["usage"] + grp["environment"] + grp["matchup"]
     ladder = {"naive": ["fp_l3"], "season": ["fp_season"], "usage": grp["usage"], "usage+env": grp["usage"] + grp["environment"], "full": all_cols}
@@ -217,7 +254,8 @@ for pos, grp in GROUPS.items():
     for name, cols in ladder.items():
         out = []
         for w in range(7, 19):
-            a, b = tr[tr.week < w], tr[tr.week == w].copy()
+            # walk-forward within the training season; an extra (earlier) season is always in the training rows
+            a, b = tr[(tr.week < w) | (tr.season < TRAIN)], tr[(tr.week == w) & (tr.season == TRAIN)].copy()
             if b.empty:
                 continue
             Xa, Xb = fill(a, b, cols)
@@ -268,7 +306,7 @@ for pos, grp in GROUPS.items():
         QB_PASS = _QB_PASS_BASE + COMMON_ENV + _QB_PASS_TAIL
         Xp_a, Xp_b = fill(tr, te, QB_PASS); Xr_a, Xr_b = fill(tr, te, QB_RUSH)
         scp, scr = StandardScaler().fit(Xp_a), StandardScaler().fit(Xr_a)
-        mp = Ridge(alpha=60).fit(scp.transform(Xp_a), tr.pass_fp)
+        mp = Ridge(alpha=QB_PASS_ALPHA).fit(scp.transform(Xp_a), tr.pass_fp)
         mr = Ridge(alpha=20).fit(scr.transform(Xr_a), tr.rush_fp)
         te["mean_pass"], te["mean_rush"] = mp.predict(scp.transform(Xp_b)), mr.predict(scr.transform(Xr_b))
     # ceiling model: for RBs the opponent's explosive-run susceptibility improves p90 (validated 2025) without moving the mean

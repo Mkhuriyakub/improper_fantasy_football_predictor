@@ -16,11 +16,11 @@
   },
   "usage+env": {
    "MAE": 6.67,
-   "rank": 0.37
+   "rank": 0.368
   },
   "full": {
    "MAE": 6.71,
-   "rank": 0.36
+   "rank": 0.359
   }
  },
  "WR": {
@@ -35,20 +35,20 @@
    "rank": 0.322
   },
   "usage": {
-   "MAE": 6.18,
+   "MAE": 6.2,
    "rank": 0.358
   },
   "usage+env": {
-   "MAE": 6.15,
-   "rank": 0.355
+   "MAE": 6.16,
+   "rank": 0.356
   },
   "full": {
-   "MAE": 6.24,
-   "rank": 0.346
+   "MAE": 6.25,
+   "rank": 0.347
   }
  },
  "QB": {
-  "n": 442,
+  "n": 877,
   "chosen": "usage+env",
   "naive": {
    "MAE": 7.46,
@@ -59,16 +59,16 @@
    "rank": 0.131
   },
   "usage": {
-   "MAE": 6.76,
-   "rank": 0.116
+   "MAE": 6.79,
+   "rank": 0.122
   },
   "usage+env": {
-   "MAE": 6.64,
-   "rank": 0.246
+   "MAE": 6.66,
+   "rank": 0.224
   },
   "full": {
-   "MAE": 6.64,
-   "rank": 0.227
+   "MAE": 6.69,
+   "rank": 0.187
   }
  },
  "TE": {
@@ -84,15 +84,15 @@
   },
   "usage": {
    "MAE": 5.5,
-   "rank": 0.294
+   "rank": 0.292
   },
   "usage+env": {
    "MAE": 5.52,
-   "rank": 0.271
+   "rank": 0.27
   },
   "full": {
-   "MAE": 5.6,
-   "rank": 0.241
+   "MAE": 5.61,
+   "rank": 0.245
   }
  }
 }

@@ -3,7 +3,7 @@
 What the data has shown so far, in order of confidence. Every claim below was
 tested on free nflverse data, mostly the 2025 season walk-forward (each week
 projected from prior weeks only) with 2023–24 and 2000–25 used where noted.
-Updated through week 9 of the 2026 season.
+Updated through week 11 of the 2026 season.
 
 ## The headline, after week 9: the model has not beaten a season average
 
@@ -256,6 +256,43 @@ calendar weeks, so a bye doesn't lengthen the absence.
 tiny snap share for that game; `snap_last` (a TE input) now ignores a last
 game under half the prior games' average. Bowers week 11: 19% snaps in week
 10 (injured early) had cut his projection to 10.8; corrected, 14.7.
+
+**Passing efficiency belongs in the quarterback inputs; an "elite passer
+premium" beyond it does not exist in the data.** (Prompted by Brock Purdy,
+week 11: 16.5 projected, 22.2 scored, in a 35–10 win. Through week 10 he was
+2nd in EPA/dropback (+0.274), 2nd in success rate (54%), 1st in ANY/A (8.5),
+3rd in TD rate, 3rd–4th in CPOE — and 6th in passing points per game, on 31
+dropbacks a game against 39–40 for Burrow and Prescott. 4th in EPA/dropback
+in 2025 as well.) Two things were wrong and one was not:
+
+- The projection (median) for quarterbacks used a feature set with no
+  efficiency metric at all; EPA/dropback and CPOE entered only the mean, and
+  the passing ridge (alpha 60) regressed his 18.3 season passing average to
+  14.1 before the Minnesota adjustment (−1.4) was applied. Over weeks 7–10
+  the model had him at 22.2 against 23.0 actual; week 11 was the miss.
+- Fix, tested on 2024 and 2025 walk-forward and 2026 weeks 7–11
+  (`notebooks/qb_model_experiments.py`, 12 variants): walk-forward
+  season-to-date EPA/dropback, success rate, ANY/A, passing points per
+  dropback and dropbacks per game (100-dropback prior, prior season at half
+  weight) as inputs to the passing mean and the median; passing alpha 60 → 20;
+  QB models fit on 2024+2025 instead of 2025 alone. Top-16 + emerging QBs:
+  2025 walk-forward 6.67 → 6.66 MAE (noise), rank 0.195 → 0.206; 2026 live
+  6.47 → 6.42, rank 0.33 → 0.36. Doubling the training seasons alone raised
+  2026 live rank for every variant (0.26 → 0.33). Gradient boosting (7.05 on
+  2025) and a volume × efficiency two-stage model (best on 2025, worse with
+  2024 added) were rejected as not robust. Week 11 re-projected with the new
+  model (`results/board_2026_wk11_qb_v2.csv`): Purdy 16.5 → 17.3 (mean 15.4 →
+  18.0), Burrow 20.9 → 21.8, Mahomes 18.3 → 20.2, Stroud 18.2 → 19.8, Goff
+  15.3 → 14.4, Mayfield 14.9 → 12.8. The graded week 11 log keeps the
+  pre-game numbers.
+- What is *not* there: a premium for elite passers beyond their inputs.
+  Pooled over 464 top-16 QB-weeks (2024 wf, 2025 wf, 2026 live) the model's
+  bias by season-to-date efficiency quintile is zero (top quintile +0.1). By
+  season the top-5 passers were under-projected 1.0 in 2024, *over*-projected
+  1.4 in 2025, under-projected 1.3 in 2026 (top tercile +2.2 in 2026 weeks
+  7–11, the Purdy/Burrow/Prescott/Stroud year). The residual slope on
+  EPA/dropback is +10, −14 and +20 points per unit in the three seasons, none
+  significant. A boost sized on 2026 would have cost accuracy in 2025.
 
 ## Tested and rejected: these don't improve weekly projections
 
