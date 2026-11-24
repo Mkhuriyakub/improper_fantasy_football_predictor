@@ -313,6 +313,8 @@ game under half the prior games' average. Bowers week 11: 19% snaps in week
 | 9 | 14 game winners | 14/14 | Vegas 13/14 |
 | 10 | 91 board players (LAC/BAL pending) | 7.4 (mean), 7.0 (median) | — | Season average 7.0; high-scoring week (SF–DAL 46–40). Coverage 75%. Usage labels: "elite/high" utilization beat projection by +1.2/+2.2, "mid/low" fell short by −1.8/−1.6 |
 | 10 | 13 game winners | 9/13 | Vegas 9/13 | Same picks as the market; missed NYG, GB, NO, HOU | EPA-margin + starter check; only GB@NE differed from the closing line |
+| 11 | 131 board players (CIN/WAS pending; 5 DNPs excluded: Bowers, Klubnik, Estime, Lambert-Smith, Gadsden) | 5.35 (mean), 5.07 (median) | — | Season average 5.36, naive 5.97; median beat the season average at QB/RB/WR, lost at TE (5.08 vs 4.82). Coverage 86% (QB 95, RB 83, TE 81, WR 85). Rank: RB 0.66, WR 0.53, QB 0.40, TE 0.13. Bias vs median +0.7 to +1.4 at every utilization label (mean unbiased, ±0.4). Flags: soft run D 1/13 p90 hits (Coleman 34.9), 5/13 beat p50; emerging 4/11 beat projection (Coleman +23, E. Johnson +9, Mendoza +11, Hill +12; Nix, Lemon, Skattebo, Allgeier short); sole-sub Johnson 15.0 → 24.3; returning Montgomery 10.2 → 15.4, Evans 8.1 → 22.9, Smith 9.7 → 9.1. No extreme-weather flags. Starter miss: Klubnik projected for NYJ, Geno Smith started (19.4) |
+| 11 | 12 game winners (CIN@WAS pending) | 9/12 | Vegas 9/12 | Same picks as the market; missed JAX (NYG won), LAC (NYJ won), PIT (PHI won) |
 
 Open question after 4 weeks: the model regresses high-usage stars harder than
 ESPN and has now lost to ESPN three weeks running on tracked players, and in
