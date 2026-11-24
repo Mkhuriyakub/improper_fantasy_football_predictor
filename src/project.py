@@ -345,6 +345,10 @@ for pos, grp in GROUPS.items():
     if pos == "QB":
         te["mean_pass"] = te.mean_pass * te.return_factor + te.def_adj
     te["p10"], te["p50"], te["p90"] = q10.predict(Xb_s), q50.predict(Xb_s), q90.predict(Xb_qs)
+    # separately fit quantiles can cross on unusual inputs (week 12: a 12%-snap back with 11 touches/g projected
+    # p50 -2.0 below p10 -0.2); enforce p10 <= p50 <= p90 by sorting the three, which leaves ordinary rows untouched
+    qs = np.sort(te[["p10", "p50", "p90"]].values, axis=1)
+    te["p10"], te["p50"], te["p90"] = qs[:, 0], qs[:, 1], qs[:, 2]
     for c in ("p10", "p50", "p90"):
         te[c] = te[c] * te.return_factor + te.def_adj
     # group contributions: sum of (standardized feature * coef) by group, relative to an average player
