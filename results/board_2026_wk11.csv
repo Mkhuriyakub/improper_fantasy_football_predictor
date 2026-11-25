@@ -1,13 +1,13 @@
 rank,tier,utilization,player,position,team,opp,spread,p10,p50,p90,mean,fp_season,fp_l3,snap_l3,carry_share_l3,target_share_l3,rz_share,def_tier,shootout,emerging,status,practice,injury,injury_adj,sole_sub,missed_weeks,return_factor,espn,actual
 1,QB1-a,,Dak Prescott,QB,DAL,TEN,-7.5,9.59,24.32,32.51,22.54,20.19,24.57,1.0,0.16,0.0,0.25,avg or below,0,0,none,none,,0.0,0,0,1.0,,35.9
 2,QB1-b,,Josh Allen,QB,BUF,MIA,-16.5,7.59,21.34,25.83,22.12,24.78,20.56,0.95,0.2,0.0,0.35,avg or below,0,0,none,none,,0.0,0,0,1.0,,12.16
-3,QB1-b,,Joe Burrow,QB,CIN,WAS,-6.0,8.27,20.91,30.33,20.69,25.81,34.08,0.98,0.13,0.0,0.53,avg or below,0,0,none,Full Participation in Practice,illness,-1.6,0,0,1.0,,
+3,QB1-b,,Joe Burrow,QB,CIN,WAS,-6.0,8.27,20.91,30.33,20.69,25.81,34.08,0.98,0.13,0.0,0.53,avg or below,0,0,none,Full Participation in Practice,illness,-1.6,0,0,1.0,,19.9
 4,QB1-b,,Caleb Williams,QB,CHI,NO,-11.5,4.23,20.43,26.69,19.27,18.39,16.29,1.0,0.18,0.0,0.23,avg or below,0,0,none,none,,0.0,0,0,1.0,,14.34
 5,QB1-b,,Bo Nix,QB,DEN,LV,-11.5,4.09,19.14,24.88,17.12,14.53,20.38,1.0,0.25,0.0,0.21,avg or below,0,1,none,none,,0.0,0,0,1.0,,11.5
 6,QB1-b,,Cam Ward,QB,TEN,DAL,7.5,5.18,18.66,30.13,19.45,13.3,17.05,1.0,0.21,0.0,0.31,avg or below,0,0,none,none,,0.0,0,0,1.0,,22.22
 7,QB1-b,,Patrick Mahomes,QB,KC,ARI,-15.5,5.19,18.26,25.27,17.22,19.71,25.81,0.96,0.08,0.0,0.16,avg or below,0,0,none,Full Participation in Practice,elbow,0.0,0,0,1.0,,24.96
 8,QB1-b,,C.J. Stroud,QB,HOU,IND,-12.5,5.58,18.15,26.47,16.79,20.5,23.68,0.96,0.11,0.0,0.05,avg or below,0,0,none,none,,0.0,0,0,1.0,,20.46
-9,QB1-b,,Jayden Daniels,QB,WAS,CIN,6.0,6.7,17.79,29.07,19.19,19.42,16.77,1.0,0.28,0.0,0.19,avg or below,0,0,none,Full Participation in Practice,elbow,0.0,0,0,1.0,,
+9,QB1-b,,Jayden Daniels,QB,WAS,CIN,6.0,6.7,17.79,29.07,19.19,19.42,16.77,1.0,0.28,0.0,0.19,avg or below,0,0,none,Full Participation in Practice,elbow,0.0,0,0,1.0,,17.060000000000002
 10,QB1-b,,Justin Herbert,QB,LAC,NYJ,-3.0,2.91,16.84,24.64,15.64,10.77,11.57,0.93,0.17,0.0,0.17,avg or below,0,0,none,none,,0.0,0,0,1.0,,22.44
 11,QB1-b,,Jacoby Brissett,QB,BAL,CAR,2.5,3.19,16.7,24.92,17.41,13.66,11.74,0.86,0.21,0.0,0.31,avg or below,0,0,none,none,,0.0,0,0,1.0,,13.74
 12,QB1-b,,Brock Purdy,QB,SF,MIN,-4.5,6.26,16.54,25.37,15.38,22.55,22.92,0.97,0.13,0.0,0.22,very good,0,0,none,none,,0.0,0,0,1.0,,22.200000000000003
@@ -40,12 +40,12 @@ rank,tier,utilization,player,position,team,opp,spread,p10,p50,p90,mean,fp_season
 14,RB2-a,mid,Bucky Irving,RB,TB,DET,3.5,6.37,12.58,24.08,13.78,17.68,24.9,0.59,0.61,0.12,0.21,avg or below,0,0,none,Full Participation in Practice,,0.0,0,0,1.0,,19.0
 15,RB2-a,high,Jonah Coleman,RB,DEN,LV,-11.5,4.36,11.72,24.38,14.54,12.58,16.82,0.64,0.62,0.12,0.21,avg or below,0,1,none,none,,0.0,0,0,1.0,,34.9
 16,RB2-a,mid,Breece Hall,RB,NYJ,LAC,3.0,3.32,11.56,23.28,12.39,13.8,11.88,0.5,0.65,0.1,0.12,avg or below,0,0,none,none,,0.0,0,0,1.0,,19.0
-17,RB2-a,high,Chase Brown,RB,CIN,WAS,-6.0,4.64,11.55,25.02,14.01,14.41,18.72,0.68,0.57,0.17,0.12,avg or below,0,1,none,none,,0.0,0,0,1.0,,
+17,RB2-a,high,Chase Brown,RB,CIN,WAS,-6.0,4.64,11.55,25.02,14.01,14.41,18.72,0.68,0.57,0.17,0.12,avg or below,0,1,none,none,,0.0,0,0,1.0,,8.6
 18,RB2-a,mid,Jaylen Warren,RB,PIT,PHI,-3.5,4.77,10.96,21.87,13.25,16.66,16.56,0.53,0.53,0.14,0.09,avg or below,0,0,none,none,,0.0,0,0,1.0,,4.9
 19,RB2-a,mid,Bhayshul Tuten,RB,JAX,NYG,-6.0,4.18,10.9,23.15,12.14,16.39,20.75,0.52,0.65,0.09,0.2,avg or below,0,0,none,Limited Participation in Practice,ankle,-0.7,0,0,1.0,,8.3
 20,RB2-a,low,David Montgomery,RB,HOU,IND,-12.5,1.9,10.23,18.59,11.98,9.1,5.15,0.44,0.55,0.04,0.17,avg or below,0,0,none,Full Participation in Practice,groin,-0.1,0,4,0.8,,15.4
 21,RB2-a,high,Ollie Gordon II,RB,MIA,BUF,16.5,3.89,9.42,19.62,9.77,11.89,9.77,0.75,0.85,0.07,0.2,avg or below,0,0,none,none,,0.0,0,0,1.0,,8.7
-22,RB2-a,mid,Rachaad White,RB,WAS,CIN,6.0,3.56,8.99,21.6,11.88,9.74,9.54,0.52,0.48,0.09,0.14,avg or below,0,0,Questionable,Did Not Participate In Practice,heel,0.0,0,0,1.0,,
+22,RB2-a,mid,Rachaad White,RB,WAS,CIN,6.0,3.56,8.99,21.6,11.88,9.74,9.54,0.52,0.48,0.09,0.14,avg or below,0,0,Questionable,Did Not Participate In Practice,heel,0.0,0,0,1.0,,0.0
 23,RB2-a,low,Alvin Kamara,RB,NO,CHI,11.5,2.4,8.9,22.3,10.09,11.26,11.82,0.43,0.31,0.15,0.14,avg or below,0,0,none,Full Participation in Practice,,0.0,0,0,1.0,,7.2
 24,RB2-a,high,Cam Skattebo,RB,NYG,JAX,6.0,1.33,8.79,17.97,8.97,13.94,18.93,0.69,0.75,0.08,0.14,good,0,1,none,Full Participation in Practice,hamstring,-1.4,0,0,1.0,,5.800000000000001
 25,RB3-a,low,Emari Demercado,RB,HOU,IND,-12.5,0.17,8.46,20.23,9.54,1.85,2.41,0.24,0.28,0.04,0.14,avg or below,0,0,none,none,,0.0,0,0,1.0,,4.9
@@ -53,9 +53,9 @@ rank,tier,utilization,player,position,team,opp,spread,p10,p50,p90,mean,fp_season
 27,RB3-a,high,Tyler Allgeier,RB,ARI,KC,15.5,2.98,7.75,18.0,7.81,9.21,14.07,0.67,0.73,0.1,0.19,above avg,0,1,none,none,,0.0,0,0,1.0,,2.3000000000000003
 28,RB3-a,mid,Braelon Allen,RB,NYJ,LAC,3.0,3.52,7.74,19.3,8.35,11.06,13.27,0.63,0.56,0.06,0.14,avg or below,0,0,none,none,,0.0,0,0,1.0,,9.4
 29,RB3-a,mid,Devin Singletary,RB,NYG,JAX,6.0,2.53,7.66,18.07,7.72,6.62,7.47,0.43,0.64,0.1,0.1,good,0,0,none,none,,0.0,0,0,1.0,,2.0
-30,RB3-a,low,Samaje Perine,RB,CIN,WAS,-6.0,1.3,7.29,17.15,7.77,6.53,6.58,0.35,0.37,0.03,0.24,avg or below,0,0,none,none,,0.0,0,0,1.0,,
+30,RB3-a,low,Samaje Perine,RB,CIN,WAS,-6.0,1.3,7.29,17.15,7.77,6.53,6.58,0.35,0.37,0.03,0.24,avg or below,0,0,none,none,,0.0,0,0,1.0,,13.700000000000001
 31,RB3-a,low,Travis Etienne,RB,NO,CHI,11.5,2.13,7.28,20.94,9.31,9.32,7.49,0.42,0.46,0.08,0.14,avg or below,0,0,none,none,,0.0,0,0,1.0,,7.6
-32,RB3-a,low,Austin Ekeler,RB,WAS,CIN,6.0,1.28,7.22,18.33,8.56,5.05,6.8,0.4,0.43,0.08,0.11,avg or below,0,0,none,none,,0.0,0,0,1.0,,
+32,RB3-a,low,Austin Ekeler,RB,WAS,CIN,6.0,1.28,7.22,18.33,8.56,5.05,6.8,0.4,0.43,0.08,0.11,avg or below,0,0,none,none,,0.0,0,0,1.0,,6.4
 33,RB3-a,low,Audric Estime,RB,NO,CHI,11.5,2.96,6.87,17.93,9.68,8.23,8.49,0.4,0.48,0.02,0.18,avg or below,0,0,none,none,,0.0,0,0,1.0,,
 34,RB3-a,low,Kenny Gainwell,RB,TB,DET,3.5,2.09,6.57,17.96,7.65,7.07,11.58,0.39,0.34,0.17,0.12,avg or below,0,1,none,none,,0.0,0,0,1.0,,9.9
 35,RB3-a,low,J.K. Dobbins,RB,DEN,LV,-11.5,1.9,6.29,19.45,9.02,6.94,4.51,0.2,0.29,0.01,0.14,avg or below,0,0,none,none,,0.0,0,0,1.0,,0.0
@@ -64,10 +64,10 @@ rank,tier,utilization,player,position,team,opp,spread,p10,p50,p90,mean,fp_season
 38,RB4-a,low,Rico Dowdle,RB,PIT,PHI,-3.5,1.57,5.5,14.68,6.68,8.33,10.37,0.47,0.34,0.09,0.16,avg or below,0,0,none,none,,0.0,0,0,1.0,,7.4
 39,RB4-a,low,Jordan Mason,RB,MIN,SF,4.5,2.78,5.27,14.55,7.7,6.56,5.17,0.43,0.56,0.05,0.12,avg or below,0,0,none,none,,0.0,0,0,1.0,,4.7
 40,RB4-a,low,Chris Rodriguez Jr.,RB,JAX,NYG,-6.0,0.98,5.27,15.5,7.67,6.1,9.79,0.27,0.27,0.06,0.19,avg or below,0,0,none,Full Participation in Practice,hand,0.0,0,0,1.0,,5.1000000000000005
-1,WR1-a,elite,Ja'Marr Chase,WR,CIN,WAS,-6.0,6.0,19.64,32.79,20.47,21.53,32.22,0.9,0.0,0.36,0.16,avg or below,0,0,none,none,,0.0,0,0,1.0,,
+1,WR1-a,elite,Ja'Marr Chase,WR,CIN,WAS,-6.0,6.0,19.64,32.79,20.47,21.53,32.22,0.9,0.0,0.36,0.16,avg or below,0,0,none,none,,0.0,0,0,1.0,,8.1
 2,WR1-a,elite,CeeDee Lamb,WR,DAL,TEN,-7.5,7.22,18.74,33.11,21.14,22.2,22.88,0.86,0.0,0.38,0.17,avg or below,0,0,none,none,,0.0,0,0,1.0,,30.200000000000003
 3,WR1-b,elite,Amon-Ra St. Brown,WR,DET,TB,-3.5,3.91,14.91,26.08,17.95,20.38,18.1,0.71,0.01,0.3,0.19,above avg,0,0,none,none,,0.0,0,0,1.0,,14.7
-4,WR1-b,high,Tee Higgins,WR,CIN,WAS,-6.0,4.2,14.32,26.8,15.1,19.04,23.89,0.78,0.0,0.2,0.12,avg or below,0,0,none,Full Participation in Practice,knee,-0.4,0,0,1.0,,
+4,WR1-b,high,Tee Higgins,WR,CIN,WAS,-6.0,4.2,14.32,26.8,15.1,19.04,23.89,0.78,0.0,0.2,0.12,avg or below,0,0,none,Full Participation in Practice,knee,-0.4,0,0,1.0,,12.3
 5,WR1-b,elite,George Pickens,WR,DAL,TEN,-7.5,5.24,13.81,27.63,16.86,16.42,25.25,0.69,0.0,0.26,0.11,avg or below,0,0,none,none,,0.0,0,0,1.0,,23.8
 6,WR1-b,elite,Tetairoa McMillan,WR,CAR,BAL,-2.5,3.4,13.21,24.5,13.98,14.56,11.32,0.83,0.0,0.24,0.13,avg or below,0,0,none,none,,0.0,0,0,1.0,,19.1
 7,WR1-b,elite,Nico Collins,WR,HOU,IND,-12.5,4.13,13.19,23.86,14.22,16.57,15.02,0.75,0.0,0.25,0.14,avg or below,0,0,none,none,,0.0,0,0,1.0,,14.8
@@ -81,7 +81,7 @@ rank,tier,utilization,player,position,team,opp,spread,p10,p50,p90,mean,fp_season
 15,WR2-a,high,Luther Burden III,WR,CHI,NO,-11.5,1.97,11.81,23.38,13.77,15.14,21.06,0.58,0.01,0.23,0.19,avg or below,0,0,none,Full Participation in Practice,concussion,-0.7,0,0,1.0,,3.3
 16,WR2-a,elite,Garrett Wilson,WR,NYJ,LAC,3.0,3.47,11.41,24.61,13.4,14.37,11.6,0.87,0.0,0.28,0.12,avg or below,0,0,none,none,,0.0,0,0,1.0,,6.9
 17,WR2-a,high,Parker Washington,WR,JAX,NYG,-6.0,2.9,10.64,21.96,12.29,15.31,15.9,0.71,0.01,0.22,0.17,avg or below,0,0,none,none,,0.0,0,0,1.0,,18.3
-18,WR2-a,high,Stefon Diggs,WR,WAS,CIN,6.0,3.26,10.4,22.27,11.77,13.82,13.82,0.63,0.0,0.23,0.12,avg or below,0,0,none,Did Not Participate In Practice,,0.0,0,0,1.0,,
+18,WR2-a,high,Stefon Diggs,WR,WAS,CIN,6.0,3.26,10.4,22.27,11.77,13.82,13.82,0.63,0.0,0.23,0.12,avg or below,0,0,none,Did Not Participate In Practice,,0.0,0,0,1.0,,8.5
 19,WR2-a,elite,DeVonta Smith,WR,PHI,PIT,3.5,2.05,9.71,19.97,10.1,17.25,19.84,0.85,0.0,0.34,0.07,avg or below,0,0,none,Full Participation in Practice,hamstring,-1.4,0,3,0.85,,9.1
 20,WR2-a,mid,Deebo Samuel Sr.,WR,SF,MIN,-4.5,1.72,9.11,20.21,10.16,14.38,17.27,0.59,0.11,0.14,0.17,very good,0,0,none,none,,0.0,0,0,1.0,,7.7
 21,WR2-a,elite,Carnell Tate,WR,TEN,DAL,7.5,1.77,9.02,19.72,9.68,11.04,10.08,0.8,0.0,0.23,0.06,avg or below,0,0,Questionable,Full Participation in Practice,shoulder,-1.2,0,2,1.0,,13.8
@@ -107,13 +107,13 @@ rank,tier,utilization,player,position,team,opp,spread,p10,p50,p90,mean,fp_season
 41,WR4-a,mid,Quentin Johnston,WR,LAC,NYJ,-3.0,1.52,7.05,17.6,9.01,5.93,7.68,0.81,0.01,0.11,0.0,avg or below,0,0,none,none,,0.0,0,0,1.0,,2.0
 42,WR4-a,mid,Keon Coleman,WR,BUF,MIA,-16.5,1.27,6.78,17.91,7.92,8.17,2.65,0.64,0.0,0.14,0.16,avg or below,0,0,none,Full Participation in Practice,ankle,0.0,0,0,1.0,,3.7
 43,WR4-a,low,Chimere Dike,WR,TEN,DAL,7.5,1.37,6.43,15.65,8.73,3.72,9.46,0.66,0.03,0.1,0.06,avg or below,0,1,none,none,,0.0,0,0,1.0,,13.3
-44,WR4-a,high,Antonio Williams,WR,WAS,CIN,6.0,1.01,6.28,15.78,6.95,8.07,9.38,0.84,0.0,0.16,0.05,avg or below,0,0,none,none,,0.0,0,0,1.0,,
+44,WR4-a,high,Antonio Williams,WR,WAS,CIN,6.0,1.01,6.28,15.78,6.95,8.07,9.38,0.84,0.0,0.16,0.05,avg or below,0,0,none,none,,0.0,0,0,1.0,,21.200000000000003
 45,WR4-a,high,Jakobi Meyers,WR,JAX,NYG,-6.0,1.52,6.16,16.85,7.34,9.11,7.24,0.68,0.01,0.19,0.2,avg or below,0,0,none,Limited Participation in Practice,ankle,0.0,0,0,1.0,,12.5
 46,WR4-a,elite,Caleb Douglas,WR,MIA,BUF,16.5,0.11,6.01,16.95,7.03,11.78,10.35,0.81,0.0,0.27,0.06,avg or below,0,0,none,Full Participation in Practice,shoulder,-1.2,0,0,1.0,,5.0
-47,WR4-a,mid,Van Jefferson,WR,WAS,CIN,6.0,1.35,5.92,18.03,6.58,8.4,13.92,0.35,0.0,0.18,0.12,avg or below,0,1,none,none,,0.0,0,1,1.0,,
+47,WR4-a,mid,Van Jefferson,WR,WAS,CIN,6.0,1.35,5.92,18.03,6.58,8.4,13.92,0.35,0.0,0.18,0.12,avg or below,0,1,none,none,,0.0,0,1,1.0,,0.0
 48,WR4-a,high,Germie Bernard,WR,PIT,PHI,-3.5,0.65,5.85,15.76,6.14,8.48,4.77,0.9,0.02,0.17,0.15,avg or below,0,0,none,none,,0.0,0,0,1.0,,10.0
 49,WR5-a,mid,Malik Washington,WR,MIA,BUF,16.5,0.99,5.67,15.98,6.69,9.91,10.86,0.79,0.02,0.14,0.12,avg or below,0,0,none,none,,0.0,0,0,1.0,,7.1000000000000005
-50,WR5-a,mid,Treylon Burks,WR,WAS,CIN,6.0,0.81,5.57,17.5,5.63,7.43,8.82,0.61,0.0,0.15,0.12,avg or below,0,0,none,Full Participation in Practice,foot,0.0,0,0,1.0,,
+50,WR5-a,mid,Treylon Burks,WR,WAS,CIN,6.0,0.81,5.57,17.5,5.63,7.43,8.82,0.61,0.0,0.15,0.12,avg or below,0,0,none,Full Participation in Practice,foot,0.0,0,0,1.0,,5.0
 51,WR5-a,high,Xavier Hutchinson,WR,HOU,IND,-12.5,1.51,5.49,15.95,6.44,9.12,13.29,0.71,0.02,0.19,0.12,avg or below,0,1,none,none,,0.0,0,0,1.0,,3.3
 52,WR5-a,mid,Rashod Bateman,WR,BAL,CAR,2.5,1.03,5.33,16.45,6.23,6.26,4.36,0.76,0.0,0.11,0.08,avg or below,0,0,none,none,,0.0,0,0,1.0,,14.7
 53,WR5-a,mid,Tre Tucker,WR,LV,DEN,11.5,0.79,5.22,16.13,5.36,11.12,3.76,0.69,0.0,0.12,0.12,above avg,0,0,none,none,,0.0,0,0,1.0,,7.0
@@ -139,7 +139,7 @@ rank,tier,utilization,player,position,team,opp,spread,p10,p50,p90,mean,fp_season
 13,TE2-a,low,Dalton Schultz,TE,HOU,IND,-12.5,1.46,7.27,16.89,7.5,8.83,8.08,0.56,0.0,0.12,0.12,avg or below,0,0,none,none,,0.0,0,0,1.0,,2.1
 14,TE2-a,high,Sam LaPorta,TE,DET,TB,-3.5,0.95,7.15,18.22,9.73,10.63,5.56,0.87,0.01,0.18,0.24,above avg,0,0,none,none,,0.0,0,0,1.0,,9.2
 15,TE2-a,low,Mason Taylor,TE,NYJ,LAC,3.0,1.98,6.96,17.15,9.41,7.53,4.43,0.66,0.0,0.11,0.2,avg or below,0,0,none,none,,0.0,0,0,1.0,,4.5
-16,TE2-a,low,Mike Gesicki,TE,CIN,WAS,-6.0,1.82,6.67,14.82,7.3,10.26,9.11,0.52,0.0,0.09,0.21,avg or below,0,0,none,none,,0.0,0,0,1.0,,
+16,TE2-a,low,Mike Gesicki,TE,CIN,WAS,-6.0,1.82,6.67,14.82,7.3,10.26,9.11,0.52,0.0,0.09,0.21,avg or below,0,0,none,none,,0.0,0,0,1.0,,12.7
 17,TE2-a,mid,Tommy Tremble,TE,CAR,BAL,-2.5,1.26,6.62,16.15,6.87,7.3,8.28,0.66,0.0,0.14,0.23,avg or below,0,0,Questionable,Limited Participation in Practice,knee,-0.4,0,0,1.0,,2.8
 18,TE2-a,mid,Mark Andrews,TE,BAL,CAR,2.5,2.28,6.49,16.84,8.36,7.49,8.21,0.57,0.02,0.15,0.17,avg or below,0,0,none,none,,0.0,0,0,1.0,,3.4000000000000004
 19,TE2-a,low,Pat Freiermuth,TE,PIT,PHI,-3.5,1.34,6.38,15.17,7.3,10.06,9.05,0.53,0.01,0.11,0.17,avg or below,0,0,none,none,,0.0,0,0,1.0,,9.0
