@@ -78,7 +78,7 @@ week,player,team,status,new_qb
 0,Terrance Ferguson,LA,Out,
 12,Tank Bigsby,PHI,Out,
 0,Jonathon Brooks,CAR,Out,
-0,Michael Pittman,PIT,Out,
+11,Michael Pittman,PIT,Out,
 0,Jeremiyah Love,ARI,Out,
 0,Dameon Pierce,PHI,Out,
 0,Kendre Miller,NO,Out,
@@ -100,3 +100,5 @@ week,player,team,status,new_qb
 12,Aaron Rodgers,PIT,Out,
 12,,PIT,,1
 12,Drew Lock,SEA,Out,
+0,Ben Skowronek,PIT,Out,
+12,Skyler Bell,BUF,Out,
